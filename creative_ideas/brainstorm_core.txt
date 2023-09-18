@@ -1,0 +1,22 @@
+Tools:
+- React
+- Go
+- PgSQL
+- Vite
+- pNpm
+
+Description: 
+- A place where users can create basic wish lists and invite friends/other users to view the list. The viewers are then able to mark (annonymously or not) if they have purchased the item. Viewers will also have a place to chat which can help them connect/communicate purchase plans. The original list-maker will not be able to see any of this and if they are to edit the list at all then by default the Viewers will be notified. This is perfect for avoiding duplicate gifts on birthdays, Christmas, weddings, and more!
+
+
+Necessities:
+- Viewers must be registered users
+- Mobile first styling
+- Avoid hamburger menu since there shouldn't be too many pages
+
+
+Possibilities:
+- Tailwind for styling
+- bun 1.0 package manager
+- include Java as a microservice
+- wrap the whole project in a docker container
