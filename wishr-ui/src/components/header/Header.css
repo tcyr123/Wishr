@@ -1,0 +1,9 @@
+/* h1 {
+    color: red;
+} 
+^ This will bleed over into all areas, even when component is not in use.
+*/
+
+.header h1 {
+    color: red;
+}
