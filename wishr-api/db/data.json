@@ -1,0 +1,114 @@
+{
+    "USERS": [
+        {
+            "username": "TCyr",
+            "email": "taylor@gmail.com",
+            "salt": "FMrg^S&l9%GR",
+            "password": "4ed7f2e6cf35c3a6dd4248e9245f4a77d09ff01970d1acca0b40975d6b96fb7b"
+        },
+        {
+            "username": "EAnderson",
+            "email": "easton@gmail.com",
+            "salt": "sDX+XTZOSdx9",
+            "password": "aa1e6cbbe9cc682bade32c4813c883bf1b5a659b5b1e736aa3d0848b60ec726e"
+        },
+        {
+            "username": "TKBonk",
+            "email": "troy@gmail.com",
+            "salt": "Qc=^bFF+YszD",
+            "password": "5f2b395eb708ce07702322e4aca9126df98c64344affb583049a058af00ea34a"
+        }
+    ],
+    "LISTS": [
+        {
+            "id": 1,
+            "title": "Taylor's Christmas List 2023",
+            "creator": "taylor@gmail.com",
+            "creation_date": "05/24/2023 3:57pm"
+        },
+        {
+            "id": 2,
+            "title": "Birthday 2022",
+            "creator": "easton@gmail.com",
+            "creation_date": "03/23/2023 1:22pm"
+        },
+        {
+            "id": 3,
+            "title": "Jason/Kelsie's Wedding",
+            "creator": "easton@gmail.com",
+            "creation_date": "05/18/2023 9:12pm"
+        },
+        {
+            "id": 4,
+            "title": "Christmas List",
+            "creator": "easton@gmail.com",
+            "creation_date": "06/27/2023 1:52pm"
+        }
+    ],
+    "ITEMS": [
+        {
+            "id": 1,
+            "list_id": 1,
+            "item_name": "Nightstand Lamp",
+            "item_description": "The black one with wireless phone charging",
+            "link": "https://www.wayfair.com/Greyleigh%E2%84%A2--Nahant-30.5-Black-Table-Lamp-X115392678-L6449-K~W004281567.html?refid=GX610289357892-W004281567&device=c&ptid=998489504873&network=g&targetid=pla-998489504873&channel=GooglePLA&ireid=130840511&fdid=1817&gclid=EAIaIQobChMIwMmY_4O8gQMVQkd_AB3KUgDZEAQYAiABEgIcrPD_BwE",
+            "assigned_user": "easton@gmail.com",
+            "is_purchased": true
+        },
+        {
+            "id": 2,
+            "list_id": 1,
+            "item_name": "Piggy Bank",
+            "item_description": "has to be pink!",
+            "link": null,
+            "assigned_user": null,
+            "is_purchased": false
+        },
+        {
+            "id": 3,
+            "list_id": 1,
+            "item_name": "Drew Barrymore's New Waffle Maker",
+            "item_description": "has to be pink!",
+            "link": "https://www.walmart.com/ip/Beautiful-6-qt-Programmable-Slow-Cooker-White-Icing-by-Drew-Barrymore/401314999?wmlspartner=wlpa&selectedSellerId=0",
+            "assigned_user": "easton@gmail.com",
+            "is_purchased": false
+        },
+        {
+            "id": 4,
+            "list_id": 1,
+            "item_name": "Nike Lunar 3.0 Cleats",
+            "item_description": "has to be pink!",
+            "link": null,
+            "assigned_user": "troy@gmail.com",
+            "is_purchased": true
+        }
+    ],
+    "MESSAGES": [
+        {
+            "id": 1,
+            "list_id": 1,
+            "user": "easton@gmail.com",
+            "date": "08/01/2023 2:54pm",
+            "message": "I can get two gifts, but not the cleats! I'm waiting on my next paycheck for the second gifth though..."
+        },
+        {
+            "id": 2,
+            "list_id": 1,
+            "user": "troy@gmail.com",
+            "date": "08/01/2023 2:58pm",
+            "message": "I just bought the cleats, no worries!"
+        },
+        {
+            "id": 3,
+            "list_id": 1,
+            "user": "easton@gmail.com",
+            "date": "08/01/2023 3:10pm",
+            "message": "Awesome! I hope someone can get the rest."
+        }
+    ],
+    "SETUP": {
+        "USERS": {},
+        "LISTS": {},
+        "ITEMS": {}
+    }
+}

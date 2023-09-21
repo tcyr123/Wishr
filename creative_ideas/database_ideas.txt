@@ -1,0 +1,2 @@
+For the sake of time, I am going to store all of the data locally in some JSON.
+Once things are stable, I will convert the local data into a postgres db. This should help me work out all the kinds as well without having to wipe and rewrite tables during the initial development process
