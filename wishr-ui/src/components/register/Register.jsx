@@ -15,7 +15,7 @@ export default function Register() {
     return (
         <div className="login">
             <img src={logo} alt="logo" className="logo" />
-            <div className="login-box">
+            <div className="card login-box">
                 <h2>Register</h2>
                 <form>
                     <div className='input-box'>

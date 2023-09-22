@@ -2,23 +2,19 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* justify-content: center; */
-    height: 50vh;
+    padding-top: 10vh;
     gap: 25px;
 }
 
 .login .logo {
     width: 500px;
+    max-width: 80%;
+    filter: drop-shadow(2px 4px 4px gray);
 }
 
 .login-box {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    text-align: center;
-    max-width: 400px;
-    width: 100%;
+    width: 400px;
+    max-width: 80%;
 }
 
 .login form {

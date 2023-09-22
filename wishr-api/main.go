@@ -5,9 +5,24 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"path/filepath"
 
 	"github.com/rs/cors"
 )
+
+func getContentType(filename string) string {
+	// Determine the Content-Type based on the file extension
+	switch filepath.Ext(filename) {
+	case ".jpg", ".jpeg":
+		return "image/jpeg"
+	case ".png":
+		return "image/png"
+	case ".gif":
+		return "image/gif"
+	default:
+		return "application/octet-stream" // Default to binary if not recognized
+	}
+}
 
 func main() {
 	// Create a new CORS handler
@@ -61,6 +76,44 @@ func main() {
 		default:
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
+	})
+
+	http.HandleFunc("/image", func(w http.ResponseWriter, r *http.Request) {
+		//Below is good for POST req parameters, not GET
+		// body, err := ioutil.ReadAll(r.Body)
+		// if err != nil {
+		// 	http.Error(w, "Error reading request body", http.StatusBadRequest)
+		// 	return
+		// }
+
+		// var user User
+		// if err := json.Unmarshal(body, &user); err != nil {
+		// 	http.Error(w, "Error decoding JSON data", http.StatusBadRequest)
+		// 	return
+		// }
+
+		photoFilename := r.URL.Query().Get("photo")
+		imagePath := "storage/" + photoFilename
+		contentType := getContentType(imagePath)
+		w.Header().Set("Content-Type", contentType)
+		http.ServeFile(w, r, imagePath)
+	})
+
+	http.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
+		user := User{
+			Username: "exampleUser",
+			Email:    "user@example.com",
+			Photo:    "alvin.jpg",
+		}
+
+		userDataJSON, err := json.Marshal(user)
+		if err != nil {
+			http.Error(w, "Error encoding user data", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(userDataJSON)
 	})
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

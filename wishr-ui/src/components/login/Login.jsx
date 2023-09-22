@@ -15,7 +15,7 @@ export default function Login() {
     return (
         <div className="login">
             <img src={logo} alt="logo" className="logo" />
-            <div className="login-box">
+            <div className="card login-box">
                 <h2>Login</h2>
                 <form>
                     <div className="input-box">

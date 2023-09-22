@@ -1,2 +1,5 @@
 For the sake of time, I am going to store all of the data locally in some JSON.
+
 Once things are stable, I will convert the local data into a postgres db. This should help me work out all the kinds as well without having to wipe and rewrite tables during the initial development process
+
+Temp going to store the users profile photo locally within the project since base64 is so hefty to store in DB. Later if this is wrapped in docker it can be stored on the 'machine' so to speak and a reference in the db table can be used to grab it

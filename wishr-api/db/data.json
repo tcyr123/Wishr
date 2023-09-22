@@ -4,19 +4,22 @@
             "username": "TCyr",
             "email": "taylor@gmail.com",
             "salt": "FMrg^S&l9%GR",
-            "password": "4ed7f2e6cf35c3a6dd4248e9245f4a77d09ff01970d1acca0b40975d6b96fb7b"
+            "password": "4ed7f2e6cf35c3a6dd4248e9245f4a77d09ff01970d1acca0b40975d6b96fb7b",
+            "photo": "simon.jpg"
         },
         {
             "username": "EAnderson",
             "email": "easton@gmail.com",
             "salt": "sDX+XTZOSdx9",
-            "password": "aa1e6cbbe9cc682bade32c4813c883bf1b5a659b5b1e736aa3d0848b60ec726e"
+            "password": "aa1e6cbbe9cc682bade32c4813c883bf1b5a659b5b1e736aa3d0848b60ec726e",
+            "photo": "alvin.jpg"
         },
         {
             "username": "TKBonk",
             "email": "troy@gmail.com",
             "salt": "Qc=^bFF+YszD",
-            "password": "5f2b395eb708ce07702322e4aca9126df98c64344affb583049a058af00ea34a"
+            "password": "5f2b395eb708ce07702322e4aca9126df98c64344affb583049a058af00ea34a",
+            "photo": "theodore.jpg"
         }
     ],
     "LISTS": [
@@ -81,6 +84,12 @@
             "link": null,
             "assigned_user": "troy@gmail.com",
             "is_purchased": true
+        }
+    ],
+    "SHARED": [
+        {
+            "list_id": 1,
+            "shared_user": "easton@gmail.com"
         }
     ],
     "MESSAGES": [
