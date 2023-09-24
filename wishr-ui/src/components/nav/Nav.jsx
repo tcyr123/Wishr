@@ -20,7 +20,7 @@ export default function Header({ profileInfo, profilePic }) {
                 </div>
                 <div className="nav-divider"></div>
                 <div className="nav-profile" onClick={() => { alert(`You are ${profileInfo.username}`) }}>
-                    <div className="nav-profile-container">
+                    <div className="profile-container">
                         <img src={profilePic || NoProfile} alt="profile" />
                     </div>
                 </div>

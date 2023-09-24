@@ -67,7 +67,6 @@ function App() {
       <Nav profilePic={userPic} profileInfo={user} />
       <div className='main'>
         <div className="page-title"><h1>Home</h1></div>
-        <hr />
         <div className="lists-all-container">
           <div className="lists">
             <h2>My Lists</h2>

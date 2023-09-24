@@ -1,0 +1,90 @@
+.items-page {
+    display: flex;
+    flex-direction: row;
+    height: 90vh;
+}
+
+.items-section {
+    flex: 4;
+    padding: 0 20px;
+    overflow: hidden;
+}
+
+.item-list-title {
+    max-width: 500px;
+    margin: 0 auto;
+    background: #e2e2e2;
+}
+
+.messages {
+    background: #e2e2e2;
+    padding: 5px 5px 0 5px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex: 1;
+    position: relative;
+}
+
+.messages h2 {
+    margin: 0px;
+}
+
+.messages-container {
+    overflow-y: scroll;
+    padding: 7px;
+}
+
+.message {
+    display: flex;
+    padding: 10px 0px;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.message-info {
+    flex: 1;
+}
+
+.message-metadata {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    color: #8e8e8e;
+}
+
+.message p {
+    margin: 0;
+    text-align: left;
+}
+
+.messages-lower-section {
+    display: flex;
+    flex-direction: column;
+    height: 95%;
+}
+
+.messages-input-container {
+    position: sticky;
+    bottom: 0px;
+    left: 0;
+    width: 100%;
+    background-color: #e2e2e2;
+}
+
+.messages-input-container input {
+    height: 30px;
+    width: 100%;
+    border-radius: 10px;
+    box-sizing: border-box;
+    border: solid black 1px;
+}
+
+/* When phone size or smaller */
+@media (max-width: 767px) {
+    .items-page {
+        flex-direction: column;
+        gap: 75px;
+        padding-bottom: 50px;
+        height: auto;
+    }
+}

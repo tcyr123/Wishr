@@ -1,4 +1,4 @@
-export const API = "http://192.168.0.13:3001" //better than "localhost" or "127.0.0.1" for testing external devices like your phone
+export const API = "http://192.168.0.13:3001"
 export const userEmail = "easton@gmail.com"
 
 //temp until DB is implemented
@@ -16,4 +16,21 @@ export function findSharedLists(user_email = userEmail, sharedLists = [], lists 
     const shared = sharedLists.filter(list => list.shared_user === user_email).map(sharedList => sharedList.list_id);
     const fullSharedList = lists.filter(list => shared.includes(list.id));
     return fullSharedList
+}
+
+export function formatDate(originalDate) {
+    if (!originalDate) {
+        return '';
+    }
+
+    const date = new Date(originalDate);
+    const options = {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+    };
+
+    return date.toLocaleString('en-US', options);
 }

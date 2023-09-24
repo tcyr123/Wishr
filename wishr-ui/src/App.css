@@ -13,7 +13,8 @@ a:hover {
   color: #0056b3;
 }
 
-.react-icons {
+.react-icons,
+svg {
   vertical-align: middle;
 }
 
@@ -34,8 +35,8 @@ a:hover {
 .lists {
   display: flex;
   flex-direction: column;
-  gap: 20px;
   width: 35%;
+  max-width: 500px;
 }
 
 .lists-all-container {
@@ -43,7 +44,8 @@ a:hover {
   flex-direction: row;
   justify-content: center;
   gap: 10%;
-  padding: 10% 0px;
+  padding: 5% 0 10% 0px;
+  align-items: center;
 }
 
 .list-single-container {
@@ -86,7 +88,7 @@ a:hover {
 }
 
 .list-add {
-  padding: 20px 40px;
+  padding: 10px 20px;
   border-radius: 50px;
 }
 
@@ -94,7 +96,6 @@ a:hover {
 @media (max-width: 1023px) {
   .main {
     padding: 1rem;
-    padding-top: 0;
   }
 
   .lists-all-container {
@@ -103,10 +104,16 @@ a:hover {
 
   .lists {
     width: unset;
-    gap: unset;
   }
 
   .lists:nth-child(2) {
     padding-top: 50px;
+  }
+}
+
+/* When phone size or smaller */
+@media (max-width: 767px) {
+  .main {
+    padding: 0;
   }
 }

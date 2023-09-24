@@ -1,0 +1,27 @@
+version: '3'
+services:
+  ui:
+    build:
+      context: ./wishr-ui
+    ports:
+      - "3000:80" # Map container port to host port for UI
+    depends_on:
+      - api # Wait for api to be up
+  api:
+    build:
+      context: ./wishr-api
+    volumes:
+      - ./storage:/storage
+    ports:
+      - "3001:3001" # Map container port to host port for API
+    depends_on:
+      - postgres # Wait for db to be up
+  postgres:
+    build:
+      context: ./wishr-db
+    ports:
+      - "3002:5432" # Map container port to host port
+    environment:
+      POSTGRES_DB: wishr
+      POSTGRES_USER: apiuser
+      POSTGRES_PASSWORD: grespost

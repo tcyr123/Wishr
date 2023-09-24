@@ -96,28 +96,23 @@
         {
             "id": 1,
             "list_id": 1,
-            "user": "easton@gmail.com",
+            "user_email": "easton@gmail.com",
             "date": "08/01/2023 2:54pm",
             "message": "I can get two gifts, but not the cleats! I'm waiting on my next paycheck for the second gifth though..."
         },
         {
             "id": 2,
             "list_id": 1,
-            "user": "troy@gmail.com",
+            "user_email": "troy@gmail.com",
             "date": "08/01/2023 2:58pm",
             "message": "I just bought the cleats, no worries!"
         },
         {
             "id": 3,
             "list_id": 1,
-            "user": "easton@gmail.com",
+            "user_email": "easton@gmail.com",
             "date": "08/01/2023 3:10pm",
             "message": "Awesome! I hope someone can get the rest."
         }
-    ],
-    "SETUP": {
-        "USERS": {},
-        "LISTS": {},
-        "ITEMS": {}
-    }
+    ]
 }
