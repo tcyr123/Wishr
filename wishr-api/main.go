@@ -43,10 +43,11 @@ func getContentType(filename string) string {
 func main() {
 	// Create a new CORS handler
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"}, // Todo: Change this in production
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders: []string{"*"},
-		Debug:          false,
+		AllowedOrigins:   []string{"http://localhost:3000"}, // Todo: Change this in production
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		Debug:            true,
 	})
 
 	// Initialize the database connection pool here
@@ -56,7 +57,14 @@ func main() {
 	}
 	defer db.Close()
 
-	//Endpoints
+	// ----- ENDPOINTS -----
+	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		Signin(w, r, db)
+	})
+	http.HandleFunc("/refresh", Refresh)
+	http.HandleFunc("/logout", Logout)
+
+	//temp
 	http.HandleFunc("/all", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -101,50 +109,17 @@ func main() {
 		}
 	})
 
-	http.HandleFunc("/image", func(w http.ResponseWriter, r *http.Request) {
-		//Below is good for POST req parameters, not GET
-		// var user User
-		// if err := json.Unmarshal(body, &user); err != nil {
-		// 	http.Error(w, "Error decoding JSON data", http.StatusBadRequest)
-		// 	return
-		// }
+	http.HandleFunc("/image", GetImageFromStorage)
 
-		photoFilename := r.URL.Query().Get("photo")
-		imagePath := "/storage/" + photoFilename
-		contentType := getContentType(imagePath)
-		w.Header().Set("Content-Type", contentType)
-		http.ServeFile(w, r, imagePath)
-	})
-
-	http.HandleFunc("/users", func(w http.ResponseWriter, r *http.Request) {
-		user := User{
-			Username: "exampleUser",
-			Email:    "user@example.com",
-			Photo:    "alvin.jpg",
-		}
-
-		userDataJSON, err := json.Marshal(user)
-		if err != nil {
-			http.Error(w, "Error encoding user data", http.StatusInternalServerError)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(userDataJSON)
-	})
-
-	http.HandleFunc("/db", func(w http.ResponseWriter, r *http.Request) {
-		err = db.Ping()
-		if err != nil {
-			log.Println(err)
-			http.Error(w, "Error pinging the db", http.StatusInternalServerError)
-			return
-		}
-	})
-
-	http.HandleFunc("/messages", func(w http.ResponseWriter, r *http.Request) {
+	//needs adjusting to return specific list messages
+	http.Handle("/messages", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		GetMessagesHandler(w, r, db)
-	})
+	})))
+
+	//needs adjusting to return specific list messages
+	http.Handle("/items", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		GetItemsHandler(w, r, db)
+	})))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Wishr API is running!")

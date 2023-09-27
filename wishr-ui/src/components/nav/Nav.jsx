@@ -1,12 +1,38 @@
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { BiBell, BiHomeAlt } from 'react-icons/bi';
 import NoProfile from "../../assets/NoProfile.png";
 import logo from "../../assets/wishrlogo.png";
+import { API } from "../../constants";
 import { useScreenSizeContext } from "../../contexts/ScreenSizeContext";
+import { useUser } from '../../contexts/UseUser';
 import "./Nav.css";
 
-
-export default function Header({ profileInfo, profilePic }) {
+export default function Nav() {
     const screenSize = useScreenSizeContext();
+    const { user, savePP } = useUser();
+    const [profilePic, setProfilePic] = useState(user?.pp)
+
+
+    useEffect(() => {
+        console.log('user is', user);
+        if (!profilePic && user && user.photo) {
+            axios.get(`${API}/image`, {
+                params: {
+                    photo: user.photo
+                },
+                responseType: 'blob' //very important line
+            })
+                .then(response => {
+                    const picture = URL.createObjectURL(response.data)
+                    savePP(picture)
+                    setProfilePic(picture);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
+    }, [user, profilePic]);
 
     return (
         <div className="nav">
@@ -19,7 +45,7 @@ export default function Header({ profileInfo, profilePic }) {
                     <div className="notification-badge">5</div>
                 </div>
                 <div className="nav-divider"></div>
-                <div className="nav-profile" onClick={() => { alert(`You are ${profileInfo.username}`) }}>
+                <div className="nav-profile" onClick={() => { alert(`You are ${user?.username}`) }}>
                     <div className="profile-container">
                         <img src={profilePic || NoProfile} alt="profile" />
                     </div>

@@ -1,15 +1,40 @@
+import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/wishrlogo.png";
+import { API } from "../../constants";
+import { useUser } from "../../contexts/UseUser";
 import "./Login.css";
 
 export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const { login } = useUser();
     const navigate = useNavigate();
 
     const handleLogin = () => {
-        console.log('Login clicked with username:', username, 'and password:', password);
+        if (!username || !password) {
+            setError('Please provide both username and password.');
+            return;
+        }
+        setLoading(true);
+
+        axios.post(`${API}/login`, {
+            email: username,
+            password: password
+        }, { withCredentials: true })
+            .then(response => {
+                login(response.data);
+                //todo: set an axios request to call "refresh"
+                navigate('/')
+            })
+            .catch(error => {
+                console.log(error);
+            }).finally(() => {
+                setLoading(false);
+            });
     };
 
     return (
@@ -36,8 +61,9 @@ export default function Login() {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
-                    <button type="button" onClick={handleLogin}>
-                        Login
+                    {error && <p className="error">{error}</p>}
+                    <button type="button" onClick={handleLogin} disabled={loading}>
+                        {loading ? "Logging in..." : "Login"}
                     </button>
                     <p>
                         Don't have an account?{' '}

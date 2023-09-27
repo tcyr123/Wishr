@@ -23,7 +23,7 @@ type Item struct {
 	ItemName        string `json:"item_name"`
 	ItemDescription string `json:"item_description"`
 	Link            string `json:"link"`
-	AssignedUser    string `json:"assigned_user"`
+	AssignedUser    User   `json:"assigned_user"`
 	IsPurchased     bool   `json:"is_purchased"`
 }
 
@@ -39,4 +39,9 @@ type Message struct {
 	UserInfo  User      `json:"user_info"`
 	Date      time.Time `json:"date"`
 	Message   string    `json:"message"`
+}
+
+type session struct {
+	email  string
+	expiry time.Time
 }

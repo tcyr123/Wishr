@@ -50,7 +50,7 @@ svg {
 
 .list-single-container {
   max-height: 500px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .list-title {
@@ -60,6 +60,7 @@ svg {
   padding: 4px;
   gap: 2px;
   margin-bottom: 7px;
+  cursor: pointer;
 }
 
 .list-title:last-child {

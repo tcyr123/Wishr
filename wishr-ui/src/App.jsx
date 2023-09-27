@@ -1,60 +1,46 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import './App.css';
 import Nav from './components/nav/Nav';
-import { API, findLists, findSharedLists, findUser, userEmail } from './constants';
+import { API, findLists, findSharedLists, userEmail } from './constants';
 import ScreenSizeContext from './contexts/ScreenSizeContext';
+import { useUser } from './contexts/UseUser';
 import useScreenSize from './hooks/useScreenSize';
 
 function App() {
   const screenSize = useScreenSize();
-  const [latestResponse, setLatestResponse] = useState()
-  const [user, setUser] = useState()
-  const [userPic, setUserPic] = useState()
   const [lists, setLists] = useState([])
   const [sharedLists, setSharedLists] = useState([])
+  const navigate = useNavigate();
+  const { user } = useUser();
 
   useEffect(() => {
     //onLoad, get all the data (temp)
     axios.get(`${API}/all`)
-      .then(function (response) {
+      .then(response => {
         //temporary until db is setup
-        setLatestResponse(response.data)
-        setUser(findUser(userEmail, response.data?.USERS))
         setLists(findLists(userEmail, response.data?.LISTS))
         setSharedLists(findSharedLists(userEmail, response.data?.SHARED, response.data?.LISTS))
       })
-      .catch(function (error) {
+      .catch(error => {
         console.log(error);
       })
   }, [])
 
-  useEffect(() => {
-    if (user && user.photo) {
-      axios.get(`${API}/image`, {
-        params: {
-          photo: user.photo
-        },
-        responseType: 'blob' //very important line
-      })
-        .then(function (response) {
-          setUserPic(URL.createObjectURL(response.data));
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }
-  }, [user]);
+  const handleListClick = (listInfo) => {
+    navigate('/items', { state: { listInfo } })
+  }
 
   function buildLists(specifiedList) {
     if (!specifiedList || specifiedList.length <= 0) { return <p>Empty</p> }
     const innerHtml = (
-      specifiedList.map(item => {
+      specifiedList.map(listInfo => {
         return (
-          <div className='list-title' key={`${item.title}-${item.creation_date}`}>
-            <small>{findUser(item.creator, latestResponse?.USERS)?.username}</small>
-            <p>{item.title}</p>
-            <small>{item.creation_date}</small>
+          <div className='list-title' key={`${listInfo.title}-${listInfo.creation_date}`} onClick={() => { handleListClick(listInfo) }}>
+            <small>{user ? user.username : "username"}</small>
+            <p>{listInfo.title}</p>
+            <small>{listInfo.creation_date}</small>
           </div>
         )
       })
@@ -64,7 +50,7 @@ function App() {
 
   return (
     <ScreenSizeContext.Provider value={screenSize}>
-      <Nav profilePic={userPic} profileInfo={user} />
+      <Nav />
       <div className='main'>
         <div className="page-title"><h1>Home</h1></div>
         <div className="lists-all-container">

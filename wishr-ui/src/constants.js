@@ -1,12 +1,17 @@
-export const API = "http://192.168.0.13:3001"
+// import axios from 'axios';
+
+export const API = "http://localhost:3001"
 export const userEmail = "easton@gmail.com"
 
-//temp until DB is implemented
-export function findUser(user_email = userEmail, users = []) {
-    const foundUsers = users.filter(user => user.email === user_email);
-    return foundUsers[0]
-}
 
+// export const axiosInstance = axios.create({
+//     withCredentials: true,
+//     baseURL: 'http://host.docker.internal:3001',
+// });
+
+// export default axiosInstance;
+
+//temp until DB is implemented
 export function findLists(user_email = userEmail, lists = []) {
     const foundLists = lists.filter(list => list.creator === user_email);
     return foundLists

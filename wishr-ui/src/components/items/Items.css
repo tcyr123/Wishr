@@ -10,10 +10,51 @@
     overflow: hidden;
 }
 
+.items-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 1080px;
+    margin: auto 0;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+}
+
 .item-list-title {
     max-width: 500px;
     margin: 0 auto;
     background: #e2e2e2;
+}
+
+.item-left {
+    justify-content: flex-start;
+}
+
+.item-right {
+    justify-content: center;
+}
+
+.item-left,
+.item-right {
+    flex: 1;
+    display: flex;
+}
+
+.item-center {
+    flex: 3;
+}
+
+.item-user {
+    margin-left: 50%;
+    transform: translate(-50%, 0);
+}
+
+.check {
+    margin-left: -20px;
+    align-self: flex-end;
 }
 
 .messages {
@@ -30,7 +71,7 @@
 }
 
 .messages-container {
-    overflow-y: scroll;
+    overflow-y: auto;
     padding: 7px;
 }
 
@@ -77,6 +118,10 @@
     border-radius: 10px;
     box-sizing: border-box;
     border: solid black 1px;
+}
+
+.strikethrough {
+    text-decoration: line-through;
 }
 
 /* When phone size or smaller */
