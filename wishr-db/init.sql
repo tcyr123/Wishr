@@ -47,7 +47,8 @@ VALUES
     (1, 1, 'Nightstand Lamp', 'The black one with wireless phone charging', 'https://www.wayfair.com/Greyleigh%E2%84%A2--Nahant-30.5-Black-Table-Lamp-X115392678-L6449-K~W004281567.html?refid=GX610289357892-W004281567&device=c&ptid=998489504873&network=g&targetid=pla-998489504873&channel=GooglePLA&ireid=130840511&fdid=1817&gclid=EAIaIQobChMIwMmY_4O8gQMVQkd_AB3KUgDZEAQYAiABEgIcrPD_BwE', 'easton@gmail.com', TRUE),
     (2, 1, 'Piggy Bank', 'has to be pink!', NULL, NULL, FALSE),
     (3, 1, 'Drew Barrymore''s New Waffle Maker', 'has to be pink!', 'https://www.walmart.com/ip/Beautiful-6-qt-Programmable-Slow-Cooker-White-Icing-by-Drew-Barrymore/401314999?wmlspartner=wlpa&selectedSellerId=0', 'easton@gmail.com', FALSE),
-    (4, 1, 'Nike Lunar 3.0 Cleats', 'has to be pink!', NULL, 'troy@gmail.com', TRUE);
+    (4, 1, 'Nike Lunar 3.0 Cleats', 'has to be pink!', NULL, 'troy@gmail.com', TRUE),
+    (5, 2, 'Lorem Ipsum Colour', 'Foorbar', 'https://www.target.com/p/fortnite-v-bucks-gift-card-digital/-/A-87469570', 'easton@gmail.com', FALSE);
 
 -- SHARED table (map of who has access to lists)
 CREATE TABLE SHARED (
@@ -75,7 +76,8 @@ INSERT INTO MESSAGES (id, list_id, user_email, date, message)
 VALUES
     (1, 1, 'easton@gmail.com', '2023-08-01 14:54:00', 'I can get two gifts, but not the cleats! I''m waiting on my next paycheck for the second gift though...'),
     (2, 1, 'troy@gmail.com', '2023-08-01 14:58:00', 'I just bought the cleats, no worries!'),
-    (3, 1, 'easton@gmail.com', '2023-08-01 15:10:00', 'Awesome! I hope someone can get the rest.');
+    (3, 1, 'easton@gmail.com', '2023-08-01 15:10:00', 'Awesome! I hope someone can get the rest.'),
+    (4, 2, 'troy@gmail.com', '2023-08-02 14:58:00', 'This is borderline a reddit clone.');
 
 
 -- Indexes

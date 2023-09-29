@@ -111,12 +111,12 @@ func main() {
 
 	http.HandleFunc("/image", GetImageFromStorage)
 
-	//needs adjusting to return specific list messages
+	//needs adjusting to return specific list messages :: UPDATE, Fixed by E.
 	http.Handle("/messages", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		GetMessagesHandler(w, r, db)
 	})))
 
-	//needs adjusting to return specific list messages
+	//needs adjusting to return specific items :: UPDATE, Fixed by E.
 	http.Handle("/items", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		GetItemsHandler(w, r, db)
 	})))

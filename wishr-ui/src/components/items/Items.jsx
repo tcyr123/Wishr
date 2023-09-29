@@ -25,17 +25,21 @@ export default function Items() {
     useEffect(() => {
         axios.get(`${API}/items`, {
             params: {
-                list_id: "2" //param not used yet
+                list_id: location.state.listInfo?.id
             }, withCredentials: true
         })
             .then(response => {
-                setItems(response.data)
+                setItems(response.data);
+                console.log(response.data)
             })
             .catch(error => {
                 console.log(error);
             })
 
-        axios.get(`${API}/messages`, { withCredentials: true })
+        axios.get(`${API}/messages`, { 
+            params: {
+                list_id: location.state.listInfo?.id
+            },withCredentials: true })
             .then(response => {
                 setMessages(response.data)
             })

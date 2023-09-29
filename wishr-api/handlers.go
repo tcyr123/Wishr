@@ -214,7 +214,16 @@ func GetImageFromStorage(w http.ResponseWriter, r *http.Request) {
 func GetMessagesHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var messages []Message
 
-	rows, err := db.Query("SELECT m.id, m.list_id, m.user_email, m.date, m.message, u.username, u.photo FROM MESSAGES m join USERS u on m.user_email = u.email")
+	// TODO?: Write new DB Query that contains similar joins but is restricted to the messages that match the list_id of the current list that we are viewing. Perhaps this is done?
+
+	// list_id for cross referencing lists, maybe a bad workaround but we will see.
+	list_id := r.URL.Query().Get("list_id")
+
+	// New DB Query for Messages
+	qry := "SELECT m.id, m.list_id, m.user_email, m.date, m.message, u.username, u.photo FROM MESSAGES m join USERS u on m.user_email = u.email WHERE m.list_id = $1"
+
+	// Contains list_id and DB Query
+	rows, err := db.Query(qry, list_id)
 	if err != nil {
 		log.Println("Error with query: ", err)
 		http.Error(w, "Error with query", http.StatusInternalServerError)
@@ -235,10 +244,14 @@ func GetMessagesHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var items []Item
-	//hardcoded list, change later
-	qry := "SELECT i.id, i.item_name,  COALESCE(i.item_description, ''),  COALESCE(i.link, ''), i.is_purchased,  COALESCE(i.assigned_user, ''), u.username, COALESCE(u.photo, '') FROM ITEMS i join USERS u on i.assigned_user = u.email WHERE list_id = 1"
 
-	rows, err := db.Query(qry)
+	//Grab List ID From URL Query
+	list_id := r.URL.Query().Get("list_id")
+
+	//DB Query for Items where list_id = list_id primary key
+	qry := "SELECT i.id, i.item_name,  COALESCE(i.item_description, ''),  COALESCE(i.link, ''), i.is_purchased,  COALESCE(i.assigned_user, ''), u.username, COALESCE(u.photo, '') FROM ITEMS i join USERS u on i.assigned_user = u.email WHERE list_id = $1"
+
+	rows, err := db.Query(qry, list_id)
 	if err != nil {
 		log.Println("Error with query: ", err)
 		http.Error(w, "Error with query", http.StatusInternalServerError)
