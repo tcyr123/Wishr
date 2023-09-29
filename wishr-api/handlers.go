@@ -269,3 +269,32 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	json.NewEncoder(w).Encode(items)
 }
+
+func GetListsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var lists []Lists
+
+	// Grab Our ID
+	user_id := r.URL.Query().Get("email")
+
+	// Query for shared and owned lists
+	qry := "SELECT id, title, creator, creation_date, shared_user, username FROM shared FULL JOIN lists ON lists.id = shared.list_id FULL JOIN users ON users.email = lists.creator WHERE creator = $1 OR shared_user = $1"
+
+	// Contains list_id and DB Query
+	rows, err := db.Query(qry, user_id)
+	if err != nil {
+		log.Println("Error with query: ", err)
+		http.Error(w, "Error with query", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var l Lists
+		if err := rows.Scan(&l.ListID, &l.Title, &l.Creator, &l.CreationDate, &l.SharedUser, &l.Username); err != nil {
+			log.Println(err)
+		}
+		lists = append(lists, l)
+	}
+
+	json.NewEncoder(w).Encode(lists)
+}

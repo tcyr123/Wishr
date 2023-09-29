@@ -28,6 +28,19 @@ function App() {
       })
   }, [])
 
+  useEffect(() => {
+      axios.get(`${API}/lists`, {
+        params: {
+          email: user?.email
+      }, withCredentials: true
+      })
+      .then(response => {
+      })
+      .catch(error => {
+        console.log(error);
+      })
+  }, [user])
+
   const handleListClick = (listInfo) => {
     navigate('/items', { state: { listInfo } })
   }

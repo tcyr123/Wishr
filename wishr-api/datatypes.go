@@ -45,3 +45,12 @@ type session struct {
 	email  string
 	expiry time.Time
 }
+
+type Lists struct {
+	ListID       int       `json:"list_id"`
+	Title        string    `json:"title"`
+	Creator      string    `json:"creator"`
+	CreationDate time.Time `json:"creation_date"`
+	SharedUser   string    `json:"shared_user"`
+	Username     string    `json:"username"`
+}
