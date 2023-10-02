@@ -1,9 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { BiCheck, BiLink } from "react-icons/bi";
+import { BiCheck, BiChevronLeft, BiLink } from "react-icons/bi";
 import { useLocation, useNavigate } from "react-router-dom";
 import NoProfile from "../../assets/NoProfile.png";
-import { API, formatDate } from '../../constants';
+import { API, formatDateNumbers } from '../../constants';
 import ScreenSizeContext from "../../contexts/ScreenSizeContext";
 import useScreenSize from "../../hooks/useScreenSize";
 import Nav from "../nav/Nav";
@@ -25,7 +25,7 @@ export default function Items() {
     useEffect(() => {
         axios.get(`${API}/items`, {
             params: {
-                list_id: location.state.listInfo?.id
+                list_id: location.state.listInfo?.list_id
             }, withCredentials: true
         })
             .then(response => {
@@ -36,10 +36,11 @@ export default function Items() {
                 console.log(error);
             })
 
-        axios.get(`${API}/messages`, { 
+        axios.get(`${API}/messages`, {
             params: {
-                list_id: location.state.listInfo?.id
-            },withCredentials: true })
+                list_id: location.state.listInfo?.list_id
+            }, withCredentials: true
+        })
             .then(response => {
                 setMessages(response.data)
             })
@@ -64,7 +65,7 @@ export default function Items() {
                         <div className="message-info">
                             <div className="message-metadata">
                                 <small>{message.user_info?.username}</small>
-                                <small>{formatDate(message.date)}</small>
+                                <small>{formatDateNumbers(message.date)}</small>
                             </div>
                             <p>{message.message}</p>
                         </div>
@@ -88,14 +89,14 @@ export default function Items() {
                                     <img src={NoProfile} alt={`${listedItem.assigned_user}-profile-photo`} />
                                 </div>
                             </div>
-                            <div className="check">{listedItem.is_purchased ? <BiCheck color='green' size={screenSize === "mobile" ? "1rem" : "1.5rem"} /> : null}</div>
+                            <div className="check">{listedItem.is_purchased ? <BiCheck color='green' /> : null}</div>
                         </div>
                         <div className={listedItem.is_purchased ? "item-center strikethrough" : "item-center"}>
                             <p>{listedItem.item_name}</p>
                             <small>{listedItem.item_description}</small>
                         </div>
                         <div className="item-right">
-                            <a href={listedItem.link}>{listedItem.link ? <BiLink color='#4080c6' size={screenSize === "mobile" ? "1rem" : "1.5rem"} /> : null}</a>
+                            <a target="_blank" href={listedItem.link}>{listedItem.link ? <BiLink color='#4080c6' /> : null}</a>
                         </div>
                     </div>
                 )
@@ -111,8 +112,7 @@ export default function Items() {
                 <div className="items-page">
                     <div className="items-section">
                         <div className="item-list-title">
-                            <a onClick={() => { navigate(-1) }}>{"<"}</a>
-                            <h1>{location.state.listInfo?.title}</h1>
+                            <h1><a onClick={() => { navigate(-1) }}><BiChevronLeft /></a>{location.state.listInfo?.title}</h1>
                         </div>
                         <div className="items-container">
                             {buildItems(items)}

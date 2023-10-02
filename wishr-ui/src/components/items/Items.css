@@ -120,6 +120,12 @@
     border: solid black 1px;
 }
 
+.item-list-title .react-icons,
+.item-list-title svg {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
 .strikethrough {
     text-decoration: line-through;
 }
@@ -129,7 +135,12 @@
     .items-page {
         flex-direction: column;
         gap: 75px;
-        padding-bottom: 50px;
         height: auto;
+    }
+
+    .item-list-title .react-icons,
+    .item-list-title svg {
+        width: 2rem;
+        height: 2rem;
     }
 }

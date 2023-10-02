@@ -16,6 +16,7 @@ import (
 
 // ----- USER LOGIN AND SESSIONS -----
 var sessions = map[string]session{} // stores the users sessions. Use redis DB in prod
+var cookie_email string
 
 func (s session) isExpired() bool {
 	return s.expiry.Before(time.Now())
@@ -45,6 +46,9 @@ func SessionMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
+		//set a global variable for this requet
+		cookie_email = userSession.email
+
 		// Call the next handler in the chain
 		next.ServeHTTP(w, r)
 	})
@@ -66,7 +70,7 @@ func Signin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// Create a new random session token
 	sessionToken := uuid.NewString()
-	expiresAt := time.Now().Add(600 * time.Second)
+	expiresAt := time.Now().Add(120 * time.Second)
 
 	// Set the token in the session map, along with the user it represents
 	sessions[sessionToken] = session{
@@ -85,10 +89,9 @@ func Signin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	//encode the user info, set the cookie, and send it all back
 	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    sessionToken,
-		Expires:  expiresAt,
-		SameSite: http.SameSiteNoneMode,
+		Name:    "session_token",
+		Value:   sessionToken,
+		Expires: expiresAt,
 	})
 	json.NewEncoder(w).Encode(userInfo)
 }
@@ -119,7 +122,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	// If the previous session is valid, create a new session token
 	// See signin function for details on how this works
 	newSessionToken := uuid.NewString()
-	expiresAt := time.Now().Add(600 * time.Second)
+	expiresAt := time.Now().Add(120 * time.Second)
 
 	sessions[newSessionToken] = session{
 		email:  userSession.email,
@@ -130,10 +133,9 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	delete(sessions, sessionToken)
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    newSessionToken,
-		Expires:  time.Now().Add(600 * time.Second),
-		SameSite: http.SameSiteNoneMode,
+		Name:    "session_token",
+		Value:   newSessionToken,
+		Expires: time.Now().Add(120 * time.Second),
 	})
 }
 
@@ -154,10 +156,9 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 	// return a bad token so user gets booted out
 	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    "",
-		Expires:  time.Now(),
-		SameSite: http.SameSiteNoneMode,
+		Name:    "session_token",
+		Value:   "",
+		Expires: time.Now(),
 	})
 }
 
@@ -214,15 +215,13 @@ func GetImageFromStorage(w http.ResponseWriter, r *http.Request) {
 func GetMessagesHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var messages []Message
 
-	// TODO?: Write new DB Query that contains similar joins but is restricted to the messages that match the list_id of the current list that we are viewing. Perhaps this is done?
-
-	// list_id for cross referencing lists, maybe a bad workaround but we will see.
 	list_id := r.URL.Query().Get("list_id")
+	if list_id == "" {
+		http.Error(w, "Missing parameters", http.StatusBadRequest)
+	}
 
-	// New DB Query for Messages
 	qry := "SELECT m.id, m.list_id, m.user_email, m.date, m.message, u.username, u.photo FROM MESSAGES m join USERS u on m.user_email = u.email WHERE m.list_id = $1"
 
-	// Contains list_id and DB Query
 	rows, err := db.Query(qry, list_id)
 	if err != nil {
 		log.Println("Error with query: ", err)
@@ -247,6 +246,9 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	//Grab List ID From URL Query
 	list_id := r.URL.Query().Get("list_id")
+	if list_id == "" {
+		http.Error(w, "Missing parameters", http.StatusBadRequest)
+	}
 
 	//DB Query for Items where list_id = list_id primary key
 	qry := "SELECT i.id, i.item_name,  COALESCE(i.item_description, ''),  COALESCE(i.link, ''), i.is_purchased,  COALESCE(i.assigned_user, ''), u.username, COALESCE(u.photo, '') FROM ITEMS i join USERS u on i.assigned_user = u.email WHERE list_id = $1"
@@ -273,14 +275,11 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 func GetListsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var lists []Lists
 
-	// Grab Our ID
-	user_id := r.URL.Query().Get("email")
-
 	// Query for shared and owned lists
-	qry := "SELECT id, title, creator, creation_date, shared_user, username FROM shared FULL JOIN lists ON lists.id = shared.list_id FULL JOIN users ON users.email = lists.creator WHERE creator = $1 OR shared_user = $1"
+	qry := "SELECT id, title, creator, creation_date, COALESCE(shared_user, ''), username FROM shared FULL JOIN lists ON lists.id = shared.list_id FULL JOIN users ON users.email = lists.creator WHERE creator = $1 OR shared_user = $1"
 
-	// Contains list_id and DB Query
-	rows, err := db.Query(qry, user_id)
+	// Contains list_id and DB Query. email comes from the request's cookie info
+	rows, err := db.Query(qry, cookie_email)
 	if err != nil {
 		log.Println("Error with query: ", err)
 		http.Error(w, "Error with query", http.StatusInternalServerError)

@@ -7,7 +7,7 @@
 }
 
 .login .logo {
-    width: 500px;
+    width: 400px;
     max-width: 80%;
     filter: drop-shadow(2px 4px 4px gray);
 }
@@ -29,4 +29,8 @@
     margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 5px;
+}
+
+.error {
+    color: red;
 }

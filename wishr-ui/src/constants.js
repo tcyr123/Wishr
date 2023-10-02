@@ -6,24 +6,13 @@ export const userEmail = "easton@gmail.com"
 
 // export const axiosInstance = axios.create({
 //     withCredentials: true,
-//     baseURL: 'http://host.docker.internal:3001',
+//     baseURL: 'http://localhost:3001',
 // });
 
 // export default axiosInstance;
 
-//temp until DB is implemented
-export function findLists(user_email = userEmail, lists = []) {
-    const foundLists = lists.filter(list => list.creator === user_email);
-    return foundLists
-}
-
-export function findSharedLists(user_email = userEmail, sharedLists = [], lists = []) {
-    const shared = sharedLists.filter(list => list.shared_user === user_email).map(sharedList => sharedList.list_id);
-    const fullSharedList = lists.filter(list => shared.includes(list.id));
-    return fullSharedList
-}
-
-export function formatDate(originalDate) {
+//puts date in format: Mar 23, 2023, 08:22 AM
+export function formatDateWords(originalDate) {
     if (!originalDate) {
         return '';
     }
@@ -38,4 +27,22 @@ export function formatDate(originalDate) {
     };
 
     return date.toLocaleString('en-US', options);
+}
+
+//puts date in format: 03/05/2023 08:22AM
+export function formatDateNumbers(originalDate) {
+    if (!originalDate) {
+        return '';
+    }
+
+    const date = new Date(originalDate);
+
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = date.getHours() % 12 || 12; // Convert to 12-hour format
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = date.getHours() >= 12 ? 'pm' : 'am';
+
+    return `${month}/${day}/${year} ${hours}:${minutes}${ampm}`;
 }

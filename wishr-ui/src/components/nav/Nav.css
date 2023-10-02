@@ -7,7 +7,7 @@
 .nav {
     background: #e2e2e2;
     width: 100%;
-    padding: 1% 0px;
+    padding: 5px 0px;
     display: flex;
     justify-content: center;
 }
@@ -30,12 +30,17 @@
     justify-content: space-between;
     align-items: center;
     padding-right: 10px;
+    position: relative;
 }
 
 .nav-profile,
 .nav-btn-container svg,
 .notification-icon {
     flex: 1;
+}
+
+.nav-profile .profile-container {
+    cursor: pointer;
 }
 
 .profile-container {
@@ -83,6 +88,66 @@
     font-weight: bold;
 }
 
+.notification-box-container {
+    margin-top: 20px;
+    position: absolute;
+    border: solid black 3px;
+    z-index: 50;
+    top: 100%;
+    right: 5px;
+    width: 100%;
+    box-shadow: 0 2px 4px #0003;
+    border-radius: 5px;
+    background-color: white;
+}
+
+.noti-messages {
+    background-color: #fff;
+    padding: 10px;
+}
+
+.noti-messages ul {
+    list-style: none;
+    max-height: 200px;
+    overflow: auto;
+    padding: 0;
+}
+
+.noti-messages ul li {
+    margin-bottom: 5px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+
+.arrow {
+    position: absolute;
+    top: -15px;
+    left: calc(50% + 5px);
+    transform: translate(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #333;
+}
+
+.arrow-notif {
+    left: calc(50% + 5px);
+}
+
+.arrow-prof {
+    left: calc(82% + 5px);
+}
+
+.nav .react-icons,
+.nav svg {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
 /* When phone size or smaller */
 @media (max-width: 767px) {
     .nav {
@@ -113,5 +178,23 @@
         height: 15px;
         line-height: 15px;
         font-size: 10px;
+    }
+
+    .notification-box-container {
+        top: unset;
+        bottom: 125%;
+    }
+
+    .arrow {
+        top: unset;
+        bottom: -15px;
+        border-bottom: unset;
+        border-top: 10px solid #333;
+    }
+
+    .nav .react-icons,
+    .nav svg {
+        width: 2rem;
+        height: 2rem;
     }
 }

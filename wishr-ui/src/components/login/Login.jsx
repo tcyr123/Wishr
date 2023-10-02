@@ -27,7 +27,6 @@ export default function Login() {
         }, { withCredentials: true })
             .then(response => {
                 login(response.data);
-                //todo: set an axios request to call "refresh"
                 navigate('/')
             })
             .catch(error => {
