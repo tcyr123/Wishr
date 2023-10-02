@@ -7,6 +7,7 @@ import {
   createBrowserRouter
 } from "react-router-dom";
 import App from './App.jsx';
+import Test from './Test.jsx';
 import Items from './components/items/Items.jsx';
 import Login from './components/login/Login.jsx';
 import Register from './components/register/Register.jsx';
@@ -28,6 +29,9 @@ const router = createBrowserRouter([
   }, {
     path: 'items',
     element: <PrivateRoute><Items /></PrivateRoute>,
+  }, {
+    path: 'test',
+    element: <PrivateRoute><Test /></PrivateRoute>,
   }, {
     path: 'login',
     element: <Login />,

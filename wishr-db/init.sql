@@ -97,3 +97,7 @@ CREATE INDEX idx_messages_list_id ON MESSAGES (list_id);
 CREATE INDEX idx_messages_user_email ON MESSAGES (user_email);
 CREATE INDEX idx_messages_date ON MESSAGES (date);
 
+-- Sync the sequences
+SELECT setval('messages_id_seq', (SELECT max(id) FROM messages));
+SELECT setval('items_id_seq', (SELECT max(id) FROM items));
+SELECT setval('lists_id_seq', (SELECT max(id) FROM lists));

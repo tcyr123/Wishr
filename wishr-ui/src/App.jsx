@@ -40,7 +40,7 @@ function App() {
       .filter((listInfo) => showMyLists ? listInfo.creator === user.email : listInfo.creator !== user.email)
       .map((listInfo) => {
         return (
-          <div className='list-title' key={listInfo.list_id} onClick={() => { handleListClick(listInfo) }}>
+          <div className='list-title' key={listInfo.list_id} onClick={() => { handleListClick({ isMyList: showMyLists, ...listInfo }) }}>
             <small>{listInfo.username}</small>
             <p>{listInfo.title}</p>
             <small>{formatDateNumbers(listInfo.creation_date)}</small>

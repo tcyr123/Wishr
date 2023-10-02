@@ -116,7 +116,18 @@ func main() {
 	http.HandleFunc("/image", GetImageFromStorage)
 
 	http.Handle("/messages", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		GetMessagesHandler(w, r, db)
+		switch r.Method {
+		case http.MethodGet:
+			GetMessagesHandler(w, r, db)
+		case http.MethodPost:
+			AddMessagesHandler(w, r, db)
+		case http.MethodDelete:
+			DeleteMessagesHandler(w, r, db)
+		case http.MethodPut:
+			EditMessagesHandler(w, r, db)
+		default:
+			http.Error(w, "Unsupported HTTP method", http.StatusMethodNotAllowed)
+		}
 	})))
 
 	http.Handle("/items", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

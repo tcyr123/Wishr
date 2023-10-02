@@ -17,6 +17,7 @@ export default function Items() {
     // const [userPic, setUserPic] = useState()
     const location = useLocation();
     const navigate = useNavigate();
+    const isMyList = location.state.listInfo?.isMyList
     if (!location || !location.state) {
         setTimeout(() => navigate("/"), 3000)
         return (<p>No data to display... Returning to home page</p>)
@@ -30,23 +31,24 @@ export default function Items() {
         })
             .then(response => {
                 setItems(response.data);
-                console.log(response.data)
             })
             .catch(error => {
                 console.log(error);
             })
 
-        axios.get(`${API}/messages`, {
-            params: {
-                list_id: location.state.listInfo?.list_id
-            }, withCredentials: true
-        })
-            .then(response => {
-                setMessages(response.data)
+        if (!isMyList) {
+            axios.get(`${API}/messages`, {
+                params: {
+                    list_id: location.state.listInfo?.list_id
+                }, withCredentials: true
             })
-            .catch(error => {
-                console.log(error);
-            })
+                .then(response => {
+                    setMessages(response.data)
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+        }
     }, [])
 
     const handleInputChange = (event) => {
@@ -79,25 +81,26 @@ export default function Items() {
 
     function buildItems(itemsList) {
         if (!itemsList || itemsList.length <= 0) { return <p>Empty</p> }
+
         const innerHtml = (
             itemsList.map(listedItem => {
                 return (
                     <div className='item' key={listedItem.id}>
-                        <div className="item-left">
+                        {isMyList ? null : <div className="item-left">
                             <div className="item-user">
                                 <div className="profile-container">
-                                    <img src={NoProfile} alt={`${listedItem.assigned_user}-profile-photo`} />
+                                    <img src={NoProfile} alt={`${listedItem.assigned_user?.email}-profile-photo`} />
                                 </div>
                             </div>
                             <div className="check">{listedItem.is_purchased ? <BiCheck color='green' /> : null}</div>
-                        </div>
+                        </div>}
                         <div className={listedItem.is_purchased ? "item-center strikethrough" : "item-center"}>
                             <p>{listedItem.item_name}</p>
                             <small>{listedItem.item_description}</small>
                         </div>
-                        <div className="item-right">
+                        {isMyList ? null : <div className="item-right">
                             <a target="_blank" href={listedItem.link}>{listedItem.link ? <BiLink color='#4080c6' /> : null}</a>
-                        </div>
+                        </div>}
                     </div>
                 )
             })
@@ -120,21 +123,22 @@ export default function Items() {
                         <br />
                         <button className='list-add'>Add Item +</button>
                     </div>
-                    <div className="messages">
-                        <h2>Discussion</h2>
-                        <hr />
-                        <div className="messages-lower-section">
-                            {buildMessages(messages)}
-                        </div>
-                        <div className="messages-input-container">
-                            <input
-                                type="text"
-                                placeholder="Add to the discussion"
-                                value={newMsg}
-                                onChange={handleInputChange}
-                            />
-                        </div>
-                    </div>
+                    {isMyList ? null :
+                        <div className="messages">
+                            <h2>Discussion</h2>
+                            <hr />
+                            <div className="messages-lower-section">
+                                {buildMessages(messages)}
+                            </div>
+                            <div className="messages-input-container">
+                                <input
+                                    type="text"
+                                    placeholder="Add to the discussion"
+                                    value={newMsg}
+                                    onChange={handleInputChange}
+                                />
+                            </div>
+                        </div>}
                 </div>
             </div>
         </ScreenSizeContext.Provider>
