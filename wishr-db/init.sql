@@ -38,7 +38,7 @@ CREATE TABLE ITEMS (
     item_description TEXT,
     link VARCHAR,
     assigned_user VARCHAR(255) REFERENCES USERS(email),
-    is_purchased BOOLEAN NOT NULL
+    is_purchased BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- ITEMS table test data

@@ -24,7 +24,7 @@ type Item struct {
 	ItemDescription string `json:"item_description"`
 	Link            string `json:"link"`
 	AssignedUser    User   `json:"assigned_user"`
-	IsPurchased     bool   `json:"is_purchased"`
+	IsPurchased     *bool  `json:"is_purchased"`
 }
 
 type Shared struct {

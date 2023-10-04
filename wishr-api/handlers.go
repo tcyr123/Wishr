@@ -372,6 +372,121 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	json.NewEncoder(w).Encode(items)
 }
 
+func AddItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var item Item
+	err := json.NewDecoder(r.Body).Decode(&item)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if item.ItemName == "" || item.ListID <= 0 {
+		http.Error(w, "Missing parameters", http.StatusBadRequest)
+		return
+	}
+
+	// Query For Now Assigns no assigned_user as I have no idea whether we want to assign a user from the get-go, so for now we're NULL
+	qry := "INSERT INTO Items (list_id, item_name, item_description, link, is_purchased) values ($1, $2, $3, $4, FALSE) RETURNING id"
+
+	var insertedID int
+	err = db.QueryRow(qry, item.ListID, item.ItemName, item.ItemDescription, item.Link).Scan(&insertedID)
+	if err != nil {
+		log.Printf("Error executing query: %v", err)
+		http.Error(w, "Failed to insert item", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]int{"id": insertedID})
+}
+
+func EditItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var item Item
+	err := json.NewDecoder(r.Body).Decode(&item)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if item.ID <= 0 {
+		http.Error(w, "Missing parameters", http.StatusBadRequest)
+		return
+	}
+
+	var queryBuffer bytes.Buffer
+	queryBuffer.WriteString("UPDATE Items SET id = id ")
+
+	//dynamic placeholders depending on what we are updating
+	var queryParams []interface{}
+	paramIndex := 1
+	if item.ItemName != "" {
+		queryBuffer.WriteString(fmt.Sprintf(", item_name = $%d ", paramIndex))
+		queryParams = append(queryParams, item.ItemName)
+		paramIndex++
+	}
+	// more ifs here for other parameters
+	if item.ItemDescription != "" {
+		queryBuffer.WriteString(fmt.Sprintf(", item_description = $%d ", paramIndex))
+		queryParams = append(queryParams, item.ItemDescription)
+		paramIndex++
+	}
+	if item.Link != "" {
+		queryBuffer.WriteString(fmt.Sprintf(", link = $%d ", paramIndex))
+		queryParams = append(queryParams, item.Link)
+		paramIndex++
+	}
+	if item.IsPurchased != nil {
+		queryBuffer.WriteString(fmt.Sprintf(", is_purchased = $%d ", paramIndex))
+		queryParams = append(queryParams, *item.IsPurchased)
+		paramIndex++
+	}
+	if item.AssignedUser.Email != "" {
+		queryBuffer.WriteString(fmt.Sprintf(", assigned_user = $%d ", paramIndex))
+		queryParams = append(queryParams, item.AssignedUser.Email)
+		paramIndex++
+	}
+
+	// Using user email to verify we aren't updating other' Items
+	queryBuffer.WriteString(fmt.Sprintf("WHERE id = $%d ", paramIndex))
+	queryParams = append(queryParams, item.ID)
+	paramIndex++
+
+	_, err = db.Exec(queryBuffer.String(), queryParams...)
+	if err != nil {
+		log.Printf("Error executing query: %v", err)
+		http.Error(w, "Failed to update message", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func DeleteItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var item Item
+	err := json.NewDecoder(r.Body).Decode(&item)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if item.ID <= 0 {
+		http.Error(w, "Missing parameters", http.StatusBadRequest)
+		return
+	}
+
+	//added a user email check to make sure we cant delete others' Items
+	qry := "DELETE FROM items WHERE id = $1 AND id IN (SELECT id FROM lists WHERE creator = $2)"
+
+	_, err = db.Exec(qry, item.ID, cookie_email)
+	if err != nil {
+		log.Printf("Error executing query: %v", err)
+		http.Error(w, "Failed to insert message", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func GetListsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var lists []Lists
 
@@ -396,4 +511,102 @@ func GetListsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	json.NewEncoder(w).Encode(lists)
+}
+
+// KEEP IN MIND THESE HANDLERS ARE SEPERATE FROM LIST*S* PLURAL, THESE ARE SINGULAR LIST.
+func AddListHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var list List
+	err := json.NewDecoder(r.Body).Decode(&list)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if list.Title == "" {
+		http.Error(w, "Missing parameters", http.StatusBadRequest)
+		return
+	}
+
+	qry := "INSERT INTO Lists (title, creator, creation_date) values ($1, $2, now()) RETURNING id"
+
+	var insertedID int
+	err = db.QueryRow(qry, list.Title, cookie_email).Scan(&insertedID)
+	if err != nil {
+		log.Printf("Error executing query: %v", err)
+		http.Error(w, "Failed to insert message", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]int{"id": insertedID})
+}
+
+func EditListHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var list List
+	err := json.NewDecoder(r.Body).Decode(&list)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if list.ID <= 0 {
+		http.Error(w, "Missing parameters", http.StatusBadRequest)
+		return
+	}
+
+	var queryBuffer bytes.Buffer
+	queryBuffer.WriteString("UPDATE lists SET ")
+
+	//dynamic placeholders depending on what we are updating
+	var queryParams []interface{}
+	paramIndex := 1
+	if list.Title != "" {
+		queryBuffer.WriteString(fmt.Sprintf("title = $%d ", paramIndex))
+		queryParams = append(queryParams, list.Title)
+		paramIndex++
+	}
+	// more ifs here for other parameters
+
+	// Using user email to verify we aren't updating other' Lists
+	queryBuffer.WriteString(fmt.Sprintf("WHERE id = $%d ", paramIndex))
+	queryParams = append(queryParams, list.ID)
+	paramIndex++
+	queryBuffer.WriteString(fmt.Sprintf("AND creator = $%d ", paramIndex))
+	queryParams = append(queryParams, cookie_email)
+	paramIndex++
+
+	_, err = db.Exec(queryBuffer.String(), queryParams...)
+	if err != nil {
+		log.Printf("Error executing query: %v", err)
+		http.Error(w, "Failed to update message", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func DeleteListHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var list List
+	err := json.NewDecoder(r.Body).Decode(&list)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if list.ID <= 0 {
+		http.Error(w, "Missing parameters", http.StatusBadRequest)
+		return
+	}
+
+	//added a user email check to make sure we cant delete others' Lists
+	qry := "DELETE FROM Lists WHERE id = $1 and creator = $2"
+
+	_, err = db.Exec(qry, list.ID, cookie_email)
+	if err != nil {
+		log.Printf("Error executing query: %v", err)
+		http.Error(w, "Failed to insert message", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

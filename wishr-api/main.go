@@ -110,7 +110,18 @@ func main() {
 	})
 
 	http.Handle("/lists", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		GetListsHandler(w, r, db)
+		switch r.Method {
+		case http.MethodGet:
+			GetListsHandler(w, r, db)
+		case http.MethodPost:
+			AddListHandler(w, r, db)
+		case http.MethodDelete:
+			DeleteListHandler(w, r, db)
+		case http.MethodPut:
+			EditListHandler(w, r, db)
+		default:
+			http.Error(w, "Unsupported HTTP method", http.StatusMethodNotAllowed)
+		}
 	})))
 
 	http.HandleFunc("/image", GetImageFromStorage)
@@ -131,7 +142,18 @@ func main() {
 	})))
 
 	http.Handle("/items", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		GetItemsHandler(w, r, db)
+		switch r.Method {
+		case http.MethodGet:
+			GetItemsHandler(w, r, db)
+		case http.MethodPost:
+			AddItemsHandler(w, r, db)
+		case http.MethodDelete:
+			DeleteItemsHandler(w, r, db)
+		case http.MethodPut:
+			EditItemsHandler(w, r, db)
+		default:
+			http.Error(w, "Unsupported HTTP method", http.StatusMethodNotAllowed)
+		}
 	})))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
