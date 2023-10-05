@@ -26,36 +26,38 @@ const PrivateRoute = ({ children }) => {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <PrivateRoute><UserProvider>
+    element: <PrivateRoute>
       <Nav >
         <App />
       </Nav>
-    </UserProvider></PrivateRoute>,
+    </PrivateRoute>,
   }, {
     path: 'items',
-    element: <PrivateRoute><UserProvider>
+    element: <PrivateRoute>
       <Nav >
         <Items />
       </Nav>
-    </UserProvider></PrivateRoute>,
+    </PrivateRoute>,
   }, {
     path: 'test',
-    element: <PrivateRoute><UserProvider>
+    element: <PrivateRoute>
       <Nav >
         <Test />
       </Nav>
-    </UserProvider></PrivateRoute>,
+    </PrivateRoute>,
   }, {
     path: 'login',
-    element: <UserProvider><Login /></UserProvider>,
+    element: <Login />,
   }, {
     path: 'register',
-    element: <UserProvider><Register /></UserProvider>,
+    element: <Register />,
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   // <React.StrictMode>
-  <RouterProvider router={router} />
+  <UserProvider>
+    <RouterProvider router={router} />
+  </UserProvider>
   // </React.StrictMode> 
 )
