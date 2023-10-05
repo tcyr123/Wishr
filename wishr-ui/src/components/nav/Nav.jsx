@@ -5,12 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import NoProfile from "../../assets/NoProfile.png";
 import logo from "../../assets/wishrlogo.png";
 import { API } from "../../constants";
-import { useScreenSizeContext } from "../../contexts/ScreenSizeContext";
 import { useUser } from '../../contexts/UseUser';
 import "./Nav.css";
 
-export default function Nav() {
-    const screenSize = useScreenSizeContext();
+export default function Nav({ children }) {
     const { user, savePP, logout } = useUser();
     const [profilePic, setProfilePic] = useState(user?.pp)
     const [showNavBox, setShowNavBox] = useState(0)
@@ -21,6 +19,14 @@ export default function Nav() {
         { id: 2, text: "TCyr shared a list with you\n\"Taylor's Christmas List 2023\"" },
         { id: 3, text: "Tcyr added a new item to the list\n\"Nike Lunar 3.0 Cleats\"" }
     ])
+
+    useEffect(() => {
+        console.log('nav is loaded');
+
+        return () => {
+            console.log('nav is unloaded');
+        }
+    }, [])
 
     useEffect(() => {
         console.log('user is', user);
@@ -99,8 +105,8 @@ export default function Nav() {
         )
     }
 
-    return (
-        <div className="nav">
+    return (<>
+        <div className="nav" key={"nav"}>
             <div className="nav-logo" onClick={() => { navigate("/") }}><img src={logo} alt='logo' /></div>
             <div className="nav-btn-container">
                 <BiHomeAlt onClick={() => { navigate("/") }} color='black' />
@@ -119,5 +125,7 @@ export default function Nav() {
                 {showNavBox === 1 ? buildNotifications() : showNavBox === 2 ? buildProfile() : null}
             </div>
         </div>
+        {children}
+    </>
     )
 }

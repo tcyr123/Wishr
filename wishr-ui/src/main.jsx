@@ -10,6 +10,7 @@ import App from './App.jsx';
 import Test from './Test.jsx';
 import Items from './components/items/Items.jsx';
 import Login from './components/login/Login.jsx';
+import Nav from "./components/nav/Nav.jsx";
 import Register from './components/register/Register.jsx';
 import { UserProvider } from './contexts/UseUser.jsx';
 import './index.css';
@@ -25,26 +26,36 @@ const PrivateRoute = ({ children }) => {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <PrivateRoute><App /></PrivateRoute>,
+    element: <PrivateRoute><UserProvider>
+      <Nav >
+        <App />
+      </Nav>
+    </UserProvider></PrivateRoute>,
   }, {
     path: 'items',
-    element: <PrivateRoute><Items /></PrivateRoute>,
+    element: <PrivateRoute><UserProvider>
+      <Nav >
+        <Items />
+      </Nav>
+    </UserProvider></PrivateRoute>,
   }, {
     path: 'test',
-    element: <PrivateRoute><Test /></PrivateRoute>,
+    element: <PrivateRoute><UserProvider>
+      <Nav >
+        <Test />
+      </Nav>
+    </UserProvider></PrivateRoute>,
   }, {
     path: 'login',
-    element: <Login />,
+    element: <UserProvider><Login /></UserProvider>,
   }, {
     path: 'register',
-    element: <Register />,
+    element: <UserProvider><Register /></UserProvider>,
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   // <React.StrictMode>
-  <UserProvider>
-    <RouterProvider router={router} />
-  </UserProvider>
+  <RouterProvider router={router} />
   // </React.StrictMode> 
 )

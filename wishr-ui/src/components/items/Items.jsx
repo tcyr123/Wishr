@@ -6,13 +6,13 @@ import NoProfile from "../../assets/NoProfile.png";
 import { API, formatDateNumbers } from '../../constants';
 import ScreenSizeContext from "../../contexts/ScreenSizeContext";
 import useScreenSize from "../../hooks/useScreenSize";
-import Nav from "../nav/Nav";
 import "./Items.css";
 
 export default function Items() {
     const screenSize = useScreenSize();
     const [items, setItems] = useState()
     const [messages, setMessages] = useState()
+    const [sharedUsers, setSharedUsers] = useState([])
     const [newMsg, setNewMsg] = useState('');
     // const [userPic, setUserPic] = useState()
     const location = useLocation();
@@ -48,6 +48,23 @@ export default function Items() {
                 .catch(error => {
                     console.log(error);
                 })
+        } else {
+            //todo
+            // axios.get(`${API}/listSharing`, {
+            //     params: {
+            //         list_id: location.state.listInfo?.list_id
+            //     }, withCredentials: true
+            // })
+            //     .then(response => {
+            //         setSharedUsers(response.data)
+            //     })
+            //     .catch(error => {
+            //         console.log(error);
+            //     })
+            setSharedUsers([
+                { username: "TCyr", email: "taylor@gmail.com", photo: "simon.jpg" },
+                { username: "TKBonk", email: "troy@gmail.com", photo: "theodore.jpg" },
+            ])
         }
     }, [])
 
@@ -86,21 +103,22 @@ export default function Items() {
             itemsList.map(listedItem => {
                 return (
                     <div className='item' key={listedItem.id}>
-                        {isMyList ? null : <div className="item-left">
-                            <div className="item-user">
-                                <div className="profile-container">
-                                    <img src={NoProfile} alt={`${listedItem.assigned_user?.email}-profile-photo`} />
+                        {isMyList ? <div className="item-left"></div> :
+                            <div className="item-left">
+                                <div className="item-user">
+                                    <div className="profile-container">
+                                        <img src={NoProfile} alt={`${listedItem.assigned_user?.email}-profile-photo`} />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="check">{listedItem.is_purchased ? <BiCheck color='green' /> : null}</div>
-                        </div>}
+                                <div className="check">{listedItem.is_purchased ? <BiCheck color='green' /> : null}</div>
+                            </div>}
                         <div className={listedItem.is_purchased ? "item-center strikethrough" : "item-center"}>
                             <p>{listedItem.item_name}</p>
                             <small>{listedItem.item_description}</small>
                         </div>
-                        {isMyList ? null : <div className="item-right">
+                        <div className="item-right">
                             <a target="_blank" href={listedItem.link}>{listedItem.link ? <BiLink color='#4080c6' /> : null}</a>
-                        </div>}
+                        </div>
                     </div>
                 )
             })
@@ -108,9 +126,27 @@ export default function Items() {
         return innerHtml
     }
 
+    function buildSharedUsers() {
+        if (!sharedUsers || sharedUsers.length <= 0) { return }
+
+        return sharedUsers.map(user => {
+            return (
+                <div className='message' key={user.email}>
+                    <div className="profile-container">
+                        <img src={NoProfile} alt={`${user.email}-profile-photo`} />
+                    </div>
+                    <div className="message-info">
+                        <small>{user.username}</small>
+                        <div className="message-metadata"></div>
+                        <small>{user.email}</small>
+                    </div>
+                </div>
+            )
+        })
+    }
+
     return (
         <ScreenSizeContext.Provider value={screenSize}>
-            <Nav />
             <div className='main'>
                 <div className="items-page">
                     <div className="items-section">
@@ -123,7 +159,14 @@ export default function Items() {
                         <br />
                         <button className='list-add'>Add Item +</button>
                     </div>
-                    {isMyList ? null :
+                    {isMyList ?
+                        <div className="messages">
+                            <h2>Viewers</h2>
+                            <hr />
+                            <div className="messages-lower-section">
+                                {buildSharedUsers(messages)}
+                            </div>
+                        </div> :
                         <div className="messages">
                             <h2>Discussion</h2>
                             <hr />
