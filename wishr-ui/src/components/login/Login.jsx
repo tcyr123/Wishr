@@ -61,9 +61,7 @@ export default function Login() {
                         />
                     </div>
                     {error && <p className="error">{error}</p>}
-                    <button type="button" onClick={handleLogin} disabled={loading}>
-                        {loading ? "Logging in..." : "Login"}
-                    </button>
+                    <button type="button" onClick={handleLogin} disabled={loading}>Login</button>
                     <p>
                         Don't have an account?{' '}
                         <a className="btn-link" onClick={() => { navigate('/register') }}>

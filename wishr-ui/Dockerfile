@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Install pnpm, & vite, copy over the project files, & build it
 RUN npm install -g vite
-RUN npm install -g pnpm
+RUN npm install -g pnpm@8.7.6
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .

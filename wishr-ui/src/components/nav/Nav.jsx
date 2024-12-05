@@ -78,9 +78,9 @@ export default function Nav({ children }) {
 
     function buildNotifications() {
         return (
-            <div class="notification-box-container" ref={navBoxRef}>
-                <div class="arrow arrow-notif"></div>
-                <div class="notification-box noti-messages">
+            <div className="notification-box-container translated-center" ref={navBoxRef}>
+                <div className="arrow arrow-notif"></div>
+                <div className="notification-box noti-messages">
                     <h2>Notifications</h2>
                     <ul>
                         {notifications.map(notification => (
@@ -93,9 +93,9 @@ export default function Nav({ children }) {
 
     function buildProfile() {
         return (
-            <div class="notification-box-container" ref={navBoxRef}>
-                <div class="arrow arrow-prof"></div>
-                <div class="notification-box">
+            <div className="notification-box-container translated-center" ref={navBoxRef}>
+                <div className="arrow arrow-prof"></div>
+                <div className="notification-box">
                     <h2>Profile</h2>
                     <div style={{ padding: "5px" }}>
                         <p key={user?.email}>{user?.username} - {user?.email}</p>

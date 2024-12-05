@@ -16,7 +16,7 @@
     align-self: center;
     text-align: left;
     flex: 2;
-    filter: drop-shadow(2px 4px 4px gray);
+    /* filter: drop-shadow(2px 4px 4px gray); */
 }
 
 .nav-logo img {
@@ -94,11 +94,11 @@
     border: solid black 3px;
     z-index: 50;
     top: 100%;
-    right: 5px;
-    width: 100%;
+    width: 95%;
     box-shadow: 0 2px 4px #0003;
     border-radius: 5px;
     background-color: white;
+    box-sizing: border-box;
 }
 
 .noti-messages {
@@ -146,6 +146,11 @@
 .nav svg {
     width: 2.5rem;
     height: 2.5rem;
+}
+
+.translated-center {
+    left: 50%;
+    transform: translate(-50%);
 }
 
 /* When phone size or smaller */

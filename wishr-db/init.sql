@@ -28,7 +28,7 @@ VALUES
     (1, 'Taylor''s Christmas List 2023', 'taylor@gmail.com', '2023-05-24 15:57:00'),
     (2, 'Birthday 2022', 'easton@gmail.com', '2023-03-23 13:22:00'),
     (3, 'Jason/Kelsie''s Wedding', 'easton@gmail.com', '2023-05-18 21:12:00'),
-    (4, 'Christmas List', 'easton@gmail.com', '2023-06-27 13:52:00');
+    (4, 'Easton''s Christmas List', 'easton@gmail.com', '2023-06-27 13:52:00');
 
 -- ITEMS table
 CREATE TABLE ITEMS (
@@ -60,7 +60,8 @@ CREATE TABLE SHARED (
 -- SHARED table test data
 INSERT INTO SHARED (list_id, shared_user)
 VALUES
-    (1, 'easton@gmail.com');
+    (1, 'easton@gmail.com'),
+    (4, 'taylor@gmail.com');
 
 -- MESSAGES table
 CREATE TABLE MESSAGES (

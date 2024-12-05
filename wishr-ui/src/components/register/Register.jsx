@@ -10,6 +10,7 @@ export default function Register() {
 
     const handleRegister = () => {
         console.log('Registration clicked with username:', username, 'and password:', password);
+        alert("todo: handle register")
     };
 
     return (

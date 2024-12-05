@@ -1,0 +1,22 @@
+"MY LISTS" TODOS:
+• List Delete (prompt)
+• List Name Edit
+• List Edit Viewers
+• List Item Delete (prompt)
+• List Item Edit
+• Grab "Viewers" Data from API
+
+"SHARED LIST" TODOS:
+• Add Functionality to Item Assignment/Unassignment/Purchased Section (prompt)
+• Add Functionality to Read/Write in the Discussion
+
+NAV TODOS:
+• Address Inconsistent Pointer
+• Add Notification Functionality (largee task)
+
+GENERAL TODOS:
+• Add Functionality to Register
+• Prompt Component (for deletion or general purpose)
+• Extract UI onCLicks into handlers
+• Address Inconsistent Manual Refresh Bug
+• UI Makeover - dark/modern themed, less hard borders, background, animation, new logo, etc

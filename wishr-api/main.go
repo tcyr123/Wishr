@@ -2,48 +2,19 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"path/filepath"
 
 	_ "github.com/lib/pq"
 
 	"github.com/rs/cors"
 )
 
-const (
-	host     = "host.docker.internal"
-	port     = 3002
-	user     = "apiuser"
-	password = "grespost"
-	dbname   = "wishr"
-)
-
-func getDBConnectionString() string {
-	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-}
-
-func getContentType(filename string) string {
-	// Determine the Content-Type based on the file extension
-	switch filepath.Ext(filename) {
-	case ".jpg", ".jpeg":
-		return "image/jpeg"
-	case ".png":
-		return "image/png"
-	case ".gif":
-		return "image/gif"
-	default:
-		return "application/octet-stream" // Default to binary if not recognized
-	}
-}
-
 func main() {
 	// Create a new CORS handler
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"}, // Todo: Change this in production
+		AllowedOrigins:   []string{"http://localhost:*"}, // Todo: Change this in production
 		AllowCredentials: true,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
@@ -63,51 +34,6 @@ func main() {
 	})
 	http.HandleFunc("/refresh", Refresh)
 	http.HandleFunc("/logout", Logout)
-
-	//temp
-	http.HandleFunc("/all", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			// Handle GET request
-			data, err := ioutil.ReadFile("db/data.json")
-			if err != nil {
-				http.Error(w, "Error reading data", http.StatusInternalServerError)
-				return
-			}
-			var result map[string]interface{}
-			if err := json.Unmarshal(data, &result); err != nil {
-				http.Error(w, "Error decoding data", http.StatusInternalServerError)
-				return
-			}
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(result)
-		/*case http.MethodPost:
-		// Handle POST request
-		var inputData map[string]interface{}
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, "Error reading request body", http.StatusBadRequest)
-			return
-		}
-		if err := json.Unmarshal(body, &inputData); err != nil {
-			http.Error(w, "Error decoding request body", http.StatusBadRequest)
-			return
-		}
-		newData, err := json.Marshal(inputData)
-		if err != nil {
-			http.Error(w, "Error encoding data", http.StatusInternalServerError)
-			return
-		}
-		err = ioutil.WriteFile("db/data.json", newData, 0644)
-		if err != nil {
-			http.Error(w, "Error writing data", http.StatusInternalServerError)
-			return
-		}
-		fmt.Fprintln(w, "Data written successfully")*/
-		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		}
-	})
 
 	http.Handle("/lists", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -151,6 +77,21 @@ func main() {
 			DeleteItemsHandler(w, r, db)
 		case http.MethodPut:
 			EditItemsHandler(w, r, db)
+		default:
+			http.Error(w, "Unsupported HTTP method", http.StatusMethodNotAllowed)
+		}
+	})))
+
+	http.Handle("/listSharing", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			GetListViewersHandler(w, r, db)
+		case http.MethodPost:
+			AddListViewerHandler(w, r, db)
+		case http.MethodDelete:
+			DeleteListViewerHandler(w, r, db)
+		// case http.MethodPut:
+		// 	EditListViewerHandler(w, r, db)
 		default:
 			http.Error(w, "Unsupported HTTP method", http.StatusMethodNotAllowed)
 		}

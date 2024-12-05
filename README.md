@@ -1,5 +1,5 @@
 # Wishr
-A place where users can create wish lists and invite others to view, comment, and make marks on the list.<br/> **Vewers** are able to mark themselves as "assigned" to a gift as well as if they have purchased the item. Viewers will also have a place to chat which can help them connect and communicate on gift purchasing plans.<br/>**Creators** will not be able to see any of the markings or discussion and if they are to edit the list, then by default the viewers will be notified.<br/><br/>
+A place where users can create wish lists and invite others to view, comment, and make marks on the list.<br/> **Vewers** are able to mark themselves as "assigned" to items as well as mark if they have purchased the item. Viewers will also have a place to chat which can help them connect and communicate on gift purchasing plans.<br/>**Creators** will not be able to see any of the markings or discussion and if they are to edit the list, then by default the viewers will be notified.<br/><br/>
 
 This is perfect for avoiding duplicate gifts on birthdays, Christmas, weddings, and more!
 
@@ -65,6 +65,7 @@ The monorepo contains the separate components, each dockerized to run as individ
  - `docker-compose down -v --rmi all` (stops and removes docker containers, images, and volumes)
  - `docker-compose up --build` (runs *docker-compose.yml* and rebuilds necessary containers)
  - Open Firefox and navigate to localhost:3000
+ - [optional] Stop the UI container and run `pnpm dev` in the UI directory for a dev environment 
 
 ## After Deploying
 Okay, so you've done everything up to this point and finally got it up and running but now what?<br/>Assuming you're looking at the login screen, feel free to create an account and get started.<br/>If, however, you don't want to go through the trouble, then just use the test account below
