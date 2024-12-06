@@ -52,6 +52,16 @@ func main() {
 
 	http.HandleFunc("/image", GetImageFromStorage)
 
+	// Users endpoint to retrieve emails
+	http.Handle("/users", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			GetAllUserEmails(w, r, db)
+		default:
+			http.Error(w, "Unsupported HTTP method", http.StatusMethodNotAllowed)
+		}
+	})))
+
 	http.Handle("/messages", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:

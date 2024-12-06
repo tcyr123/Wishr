@@ -7,8 +7,12 @@ import { API, formatDateNumbers } from '../../constants';
 import ScreenSizeContext from "../../contexts/ScreenSizeContext";
 import useScreenSize from "../../hooks/useScreenSize";
 import "./Items.css";
+// Import for react autocomplete
+import TextInput from 'react-autocomplete-input';
+import 'react-autocomplete-input/dist/bundle.css';
 
 const defaultItem = { title: null, description: null, link: null }
+const defaultViewer = "" // Added to reset viewer add after successful share
 
 export default function Items() {
     const screenSize = useScreenSize();
@@ -18,6 +22,9 @@ export default function Items() {
     const [sharedUsers, setSharedUsers] = useState([])
     const [newMsg, setNewMsg] = useState('');
     const [newItem, setNewItem] = useState(defaultItem)
+    const [newViewer, setNewViewer] = useState(defaultViewer) // Use to set the adding of a new viewer
+    const [viewerState, setViewerState] = useState('view')
+    const [totalUsers, setTotalUsers] = useState()
     // const [userPic, setUserPic] = useState()
     const location = useLocation();
     const navigate = useNavigate();
@@ -58,6 +65,7 @@ export default function Items() {
                 .catch(error => {
                     console.log(error);
                 })
+                .then(populateTotalUsers()) // Used for autocomplete
         }
     }, [])
 
@@ -68,6 +76,24 @@ export default function Items() {
     const handleItemChange = (event, key) => {
         setNewItem(current => ({ ...current, [key]: event.target.value }));
     };
+
+    const handleViewerChange = (event) => {
+        setNewViewer(event)
+    }
+
+    function populateTotalUsers() {
+        if(isMyList){
+            axios.get(`${API}/users`, {
+                withCredentials: true
+            })
+                .then(response => {
+                    setTotalUsers(response.data)
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+        }
+    }
 
     function getItems() {
         axios.get(`${API}/items`, {
@@ -101,6 +127,37 @@ export default function Items() {
             })
     }
 
+    function addViewer() {
+        if (!newViewer) { return }
+        axios.post(`${API}/listSharing`, {
+            shared_user: {email: newViewer, username: "", photo: ""}, list_id: listId
+        }, {
+            withCredentials: true
+        })
+        .then(() => {
+            alert(`Shared List With User: ${newViewer}`)
+            setNewViewer(defaultViewer)
+            getViewers()
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
+
+    function getViewers() { // Needed to reset shared users once invited
+        axios.get(`${API}/listSharing`, {
+            params: {
+                list_id: listId
+            }, withCredentials: true
+        })
+            .then(response => {
+                setSharedUsers(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    }
+
     function buildMessages(messageList) {
         if (!messageList || messageList.length <= 0) { return <p>Empty</p> }
         const innerHtml = (
@@ -127,7 +184,7 @@ export default function Items() {
     }
 
     function buildItems(itemsList) {
-        if (!itemsList || itemsList.length <= 0) { return <p>Empty</p> }
+        if (!itemsList || itemsList.length <= 0) { return <p key={"empty items"}>Empty</p> }
 
         const innerHtml = (
             itemsList.map(listedItem => {
@@ -184,6 +241,28 @@ export default function Items() {
         })
     }
 
+    // E.A 12/05/24 - Added Form for adding a viewer to your list
+    function buildViewerForm() {
+        if (viewerState === "view") {
+            return <button onClick={() => { setViewerState("add") }} className='viewer-add'><BiSolidUserPlus /> Add Viewer</button>
+        } else if (viewerState === "add") {
+            return <div className="viewer-entry-form unroll-viewer" >
+                <h2>Add A Viewer </h2>
+                <form>
+                    <div className="input-box" style={{ width: "fit-content", margin: "auto", marginBottom: "15px" }}>
+                        <label htmlFor="viewerName">Viewer Name:</label>
+                        <TextInput trigger={""} spacer="" options={totalUsers} type="text" id="viewerName" value={newViewer} placeholder='taylor@gmail.com' onChange={(e) => handleViewerChange(e)}/>
+                        {/* <input type="text" id="viewerName" value={newViewer} placeholder='taylor@gmail.com' onChange={(e) => handleViewerChange(e, "viewerName")} /> */}
+                    </div>
+                    <div className="btn-box">
+                        <button onClick={() => { setViewerState("view") }} className='list-add inverse-btn'>Cancel</button>
+                        <button onClick={() => { addViewer(); setViewerState("view") }} className='list-add'>Save</button>
+                    </div>
+                </form>
+            </div>
+        }
+    }
+
     function buildForm() {
         if (action === "view") {
             return <button onClick={() => { setAction("add") }} className='list-add'>Add Item +</button>
@@ -232,7 +311,8 @@ export default function Items() {
                             <hr />
                             <div className="messages-lower-section">
                                 {buildSharedUsers()}
-                                <button onClick={() => { alert("todo: setup share list") }} className='list-add'><BiSolidUserPlus />Add Viewer</button>
+                                {isMyList ? buildViewerForm() : null}
+                                {/* <button onClick={() => { alert("todo: setup share list") }} className='list-add'><BiSolidUserPlus />Add Viewer</button> */}
                             </div>
                         </div> :
                         <div className="messages">
