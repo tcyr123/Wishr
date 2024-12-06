@@ -159,7 +159,7 @@ func GetListsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var lists []Lists
 
 	// Query for shared and owned lists
-	qry := "SELECT id, title, creator, creation_date, COALESCE(shared_user, ''), username FROM shared FULL JOIN lists ON lists.id = shared.list_id FULL JOIN users ON users.email = lists.creator WHERE creator = $1 OR shared_user = $1"
+	qry := "SELECT lists.id, lists.title, lists.creator, lists.creation_date, users.username, CASE WHEN lists.creator = $1 THEN 'creator' WHEN shared.shared_user = $1 THEN 'shared'END AS relationship FROM shared FULL JOIN lists ON lists.id = shared.list_id FULL JOIN users ON users.email = lists.creator WHERE lists.creator = $1 OR shared.shared_user = $1 GROUP BY lists.id, lists.title, lists.creator, lists.creation_date, users.username, relationship ORDER BY relationship, lists.creation_date DESC;"
 
 	// Contains list_id and DB Query. email comes from the request's cookie info
 	rows, err := db.Query(qry, cookie_email)
@@ -322,18 +322,17 @@ func AddListViewerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	qry := "INSERT INTO shared (list_id, shared_user) values ($1, $2) RETURNING id"
+	qry := "INSERT INTO shared (list_id, shared_user) values ($1, $2)"
 
-	var insertedID int
-	err = db.QueryRow(qry, viewerDto.ListID, viewerDto.SharedUser.Email).Scan(&insertedID)
-	if err != nil {
+	_, err2 := db.Exec(qry, viewerDto.ListID, viewerDto.SharedUser.Email)
+	// err = db.QueryRow(qry, viewerDto.ListID, viewerDto.SharedUser.Email).Scan(&insertedID)
+	if err2 != nil {
 		log.Printf("Error executing query: %v", err)
 		http.Error(w, "Failed to insert viewer", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]int{"id": insertedID})
 }
 
 func DeleteListViewerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {

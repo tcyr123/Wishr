@@ -198,3 +198,28 @@ func generateSalt(length int) (string, error) {
 
 	return saltHex, nil
 }
+
+func GetAllUserEmails(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var totalUsers []string
+
+	qry := "SELECT email from USERS"
+
+	rows, err := db.Query(qry)
+
+	if err != nil {
+		log.Println("Error with query: ", err)
+		http.Error(w, "Error with query", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var m string
+		if err := rows.Scan(&m); err != nil {
+			log.Println(err)
+		}
+		totalUsers = append(totalUsers, m)
+	}
+
+	json.NewEncoder(w).Encode(totalUsers)
+}
