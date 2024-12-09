@@ -6,7 +6,6 @@ import {
   createBrowserRouter
 } from "react-router-dom";
 import App from './App.jsx';
-import Test from './Test.jsx';
 import Items from './components/items/Items.jsx';
 import Login from './components/login/Login.jsx';
 import Nav from "./components/nav/Nav.jsx";
@@ -38,20 +37,13 @@ const router = createBrowserRouter([
       </Nav>
     </PrivateRoute>,
   }, {
-    path: 'test',
-    element: <PrivateRoute>
-      <Nav >
-        <Test />
-      </Nav>
-    </PrivateRoute>,
-  }, {
     path: 'login',
     element: <Login />,
   }, {
     path: 'register',
     element: <Register />,
   },
-]);
+], { basename: import.meta.env?.VITE_BASE || "/" });
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   // <React.StrictMode>

@@ -1,12 +1,14 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { createContext, useContext, useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
 import { API } from "../constants";
 
 const UserContext = createContext();
 
 export function UserProvider({ children }) {
     const [user, setUser] = useState(null);
+    // const navigate = useNavigate();
     let tokenRefreshInterval;
 
     // Check local storage for user data during initialization
@@ -15,8 +17,9 @@ export function UserProvider({ children }) {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
             setUser(JSON.parse(storedUser));
-            refreshToken() // Catches the case of a user refresh since we don't re-call the login function that starts the timer loop
+            refreshToken(); // Catches the case of a user refresh since we don't re-call the login function that starts the timer loop
         }
+
     }, []);
 
     const login = (userData) => {
@@ -81,8 +84,8 @@ export function UserProvider({ children }) {
     const wipeout = () => {
         setUser(null);
         localStorage.removeItem('user');
-        window.location.href = '/login';
         Cookies.remove('session_token');
+        window.location.reload();
     }
 
     return (

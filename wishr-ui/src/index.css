@@ -26,10 +26,6 @@ a {
   text-decoration: inherit;
 }
 
-a:hover {
-  color: #0056b3;
-}
-
 body {
   margin: 0;
   min-width: 320px;
@@ -54,8 +50,10 @@ button {
   transition: border-color 0.25s;
 }
 
-button:hover {
+button:hover,
+a:hover {
   border-color: #0056b3;
+  filter: saturate(1.5)
 }
 
 button:focus,

@@ -1,6 +1,4 @@
-// import axios from 'axios';
-
-export const API = "http://localhost:3001"
+export const API = import.meta.env?.VITE_API_URL || "unknown_api"
 export const userEmail = "easton@gmail.com"
 
 

@@ -27,6 +27,7 @@ func SessionMiddleware(next http.Handler) http.Handler {
 		c, err := r.Cookie("session_token")
 		if err != nil {
 			if err == http.ErrNoCookie {
+				log.Println("Cookie completely missing from request")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
@@ -37,10 +38,13 @@ func SessionMiddleware(next http.Handler) http.Handler {
 
 		userSession, exists := sessions[sessionToken]
 		if !exists {
+			log.Printf("Session token %v does not exist", sessionToken)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
+
 		if userSession.isExpired() {
+			log.Printf("User Session for %v expired at %v", userSession.Email, userSession.Expiry)
 			delete(sessions, sessionToken)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
@@ -89,9 +93,11 @@ func Signin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	//encode the user info, set the cookie, and send it all back
 	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   sessionToken,
-		Expires: expiresAt,
+		Name:     "session_token",
+		Value:    sessionToken,
+		Expires:  expiresAt,
+		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
 	})
 	json.NewEncoder(w).Encode(userInfo)
 }
@@ -100,6 +106,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	c, err := r.Cookie("session_token")
 	if err != nil {
 		if err == http.ErrNoCookie {
+			log.Println("Cookie completely missing on refresh")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -110,10 +117,13 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 
 	userSession, exists := sessions[sessionToken]
 	if !exists {
+		log.Println("userSession missing on refresh")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+
 	if userSession.isExpired() {
+		log.Printf("User Session for %v expired at %v on refresh", userSession.Email, userSession.Expiry)
 		delete(sessions, sessionToken)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -130,12 +140,16 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Delete the older session token
-	delete(sessions, sessionToken)
+	time.AfterFunc(10*time.Second, func() {
+		delete(sessions, sessionToken)
+	})
 
 	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   newSessionToken,
-		Expires: time.Now().Add(120 * time.Second),
+		Name:     "session_token",
+		Value:    newSessionToken,
+		Expires:  time.Now().Add(120 * time.Second),
+		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
 	})
 }
 
@@ -156,9 +170,11 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 	// return a bad token so user gets booted out
 	http.SetCookie(w, &http.Cookie{
-		Name:    "session_token",
-		Value:   "",
-		Expires: time.Now(),
+		Name:     "session_token",
+		Value:    "",
+		Expires:  time.Now(),
+		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
 	})
 }
 

@@ -14,7 +14,7 @@ import (
 func main() {
 	// Create a new CORS handler
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:*"}, // Todo: Change this in production
+		AllowedOrigins:   []string{getEnv("ALLOWED_ORIGINS", "http://localhost:*")},
 		AllowCredentials: true,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
@@ -92,7 +92,7 @@ func main() {
 		}
 	})))
 
-	http.Handle("/listSharing", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	http.Handle("/listViewer", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			GetListViewersHandler(w, r, db)
@@ -100,8 +100,6 @@ func main() {
 			AddListViewerHandler(w, r, db)
 		case http.MethodDelete:
 			DeleteListViewerHandler(w, r, db)
-		// case http.MethodPut:
-		// 	EditListViewerHandler(w, r, db)
 		default:
 			http.Error(w, "Unsupported HTTP method", http.StatusMethodNotAllowed)
 		}
@@ -111,7 +109,14 @@ func main() {
 		fmt.Fprintln(w, "Wishr API is running!")
 	})
 
-	handler := c.Handler(http.DefaultServeMux)
+	handler := loggingMiddleware(c.Handler(http.DefaultServeMux))
 	fmt.Println("API server started on :3001")
 	http.ListenAndServe(":3001", handler)
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Method: %s, URL: %s, RemoteAddr: %s", r.Method, r.URL.String(), r.RemoteAddr)
+		next.ServeHTTP(w, r)
+	})
 }

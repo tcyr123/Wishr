@@ -46,7 +46,7 @@ export default function Nav({ children }) {
                     console.log(error);
                 });
         }
-    }, [user, profilePic]);
+    }, [user]);
 
     useEffect(() => {
         let clickTimeout;

@@ -14,7 +14,7 @@ The repo contains multiple folders in a monorepo structure which can be explaine
 > Contains a dockerized React application. All things front-end are stored here.
 
 📂*wishr-api*
-> Contains the dockerized Go code for creating an API. You may see a *db* folder inside of here which is where you will find a file titled "data.json". This was the beginnings of returning test data before the actual *wishr-db* was implemented and may be disregarded.
+> Contains the dockerized Go code for creating an API.
 
 📂*wishr-db*
 > A dockerfile that starts a container with a PostgreSQL image. Also contains a .sql file to initialize our DB with test data.
@@ -39,9 +39,9 @@ The monorepo contains the separate components, each dockerized to run as individ
 |--|--|
 |PostgreSQL  | relational DB structure normalized to 2NF |
 |Go / Golang| RESTful API |
-|React / ReactJS  | state management, comp[onents, hooks, context providers |
+|React / ReactJS  | state management, components, hooks, context providers |
 |JavaScript| local storage, cookie management |
-|Docker| docker-compose, volumes, services |
+|Docker| docker-compose, volumes, services, environment variables |
 |HTML / CSS| raw css |
 |Pnpm| reduces disk space and speeds up installations via symlinks |
 |Vite| faster development and builds compared to *Create React App* |
@@ -61,6 +61,7 @@ The monorepo contains the separate components, each dockerized to run as individ
 ## Deploying
 
  - Make sure Docker/Docker Desktop is running
+ - [optional] Modify the .env files if necessary (UI has on inside of its config folder)
  - Open a new terminal and navigate to the main wishr folder
  - `docker-compose down -v --rmi all` (stops and removes docker containers, images, and volumes)
  - `docker-compose up --build` (runs *docker-compose.yml* and rebuilds necessary containers)

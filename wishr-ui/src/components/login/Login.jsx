@@ -63,7 +63,7 @@ export default function Login() {
                     {error && <p className="error">{error}</p>}
                     <button type="button" onClick={handleLogin} disabled={loading}>Login</button>
                     <p>
-                        Don't have an account?{' '}
+                        {"Don't have an account?"}
                         <a className="btn-link" onClick={() => { navigate('/register') }}>
                             Register
                         </a>

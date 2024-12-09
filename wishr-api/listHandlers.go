@@ -49,7 +49,7 @@ func AddItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	if item.ItemName == "" || isListIdValid(item.ListID) {
+	if item.ItemName == "" || isListIdInvalid(item.ListID) {
 		http.Error(w, "Missing parameters", http.StatusBadRequest)
 		return
 	}
@@ -76,7 +76,7 @@ func EditItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	if isItemIdValid(item.ID) {
+	if isItemIdInvalid(item.ID) {
 		http.Error(w, "Missing parameters", http.StatusBadRequest)
 		return
 	}
@@ -137,7 +137,7 @@ func DeleteItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	if isItemIdValid(item.ID) {
+	if isItemIdInvalid(item.ID) {
 		http.Error(w, "Missing parameters", http.StatusBadRequest)
 		return
 	}
@@ -159,7 +159,7 @@ func GetListsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var lists []Lists
 
 	// Query for shared and owned lists
-	qry := "SELECT lists.id, lists.title, lists.creator, lists.creation_date, users.username, CASE WHEN lists.creator = $1 THEN 'creator' WHEN shared.shared_user = $1 THEN 'shared'END AS relationship FROM shared FULL JOIN lists ON lists.id = shared.list_id FULL JOIN users ON users.email = lists.creator WHERE lists.creator = $1 OR shared.shared_user = $1 GROUP BY lists.id, lists.title, lists.creator, lists.creation_date, users.username, relationship ORDER BY relationship, lists.creation_date DESC;"
+	qry := "SELECT id, title, creator, creation_date, username FROM shared FULL JOIN lists ON lists.id = shared.list_id FULL JOIN users ON users.email = lists.creator WHERE creator = $1 OR shared_user = $1 GROUP BY id, username"
 
 	// Contains list_id and DB Query. email comes from the request's cookie info
 	rows, err := db.Query(qry, cookie_email)
@@ -172,7 +172,7 @@ func GetListsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	for rows.Next() {
 		var l Lists
-		if err := rows.Scan(&l.ListID, &l.Title, &l.Creator, &l.CreationDate, &l.SharedUser, &l.Username); err != nil {
+		if err := rows.Scan(&l.ListID, &l.Title, &l.Creator, &l.CreationDate, &l.Username); err != nil {
 			log.Println(err)
 		}
 		lists = append(lists, l)
@@ -216,7 +216,7 @@ func EditListHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	if isListIdValid(list.ID) {
+	if isListIdInvalid(list.ID) {
 		http.Error(w, "Missing parameters", http.StatusBadRequest)
 		return
 	}
@@ -260,7 +260,7 @@ func DeleteListHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	if isListIdValid(list.ID) {
+	if isListIdInvalid(list.ID) {
 		http.Error(w, "Missing parameters", http.StatusBadRequest)
 		return
 	}
@@ -317,16 +317,20 @@ func AddListViewerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	if isViewerStructValid(viewerDto.SharedUser.Email, viewerDto.ListID) {
+	if isViewerStructInvalid(viewerDto.SharedUser.Email, viewerDto.ListID) {
 		http.Error(w, "Missing parameters", http.StatusBadRequest)
+		return
+	}
+
+	if viewerDto.SharedUser.Email == cookie_email {
+		http.Error(w, "Cannot set self as list viewer", http.StatusBadRequest)
 		return
 	}
 
 	qry := "INSERT INTO shared (list_id, shared_user) values ($1, $2)"
 
-	_, err2 := db.Exec(qry, viewerDto.ListID, viewerDto.SharedUser.Email)
-	// err = db.QueryRow(qry, viewerDto.ListID, viewerDto.SharedUser.Email).Scan(&insertedID)
-	if err2 != nil {
+	_, err = db.Exec(qry, viewerDto.ListID, viewerDto.SharedUser.Email)
+	if err != nil {
 		log.Printf("Error executing query: %v", err)
 		http.Error(w, "Failed to insert viewer", http.StatusInternalServerError)
 		return
@@ -343,7 +347,7 @@ func DeleteListViewerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB)
 		return
 	}
 
-	if isViewerStructValid(viewerDto.SharedUser.Email, viewerDto.ListID) {
+	if isViewerStructInvalid(viewerDto.SharedUser.Email, viewerDto.ListID) {
 		http.Error(w, "Missing parameters", http.StatusBadRequest)
 		return
 	}
@@ -362,14 +366,14 @@ func DeleteListViewerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB)
 
 // ----- Helper functions -----
 
-func isListIdValid(listId int) bool {
+func isListIdInvalid(listId int) bool {
 	return listId <= 0
 }
 
-func isItemIdValid(itemId int) bool {
+func isItemIdInvalid(itemId int) bool {
 	return itemId <= 0
 }
 
-func isViewerStructValid(email string, listId int) bool {
+func isViewerStructInvalid(email string, listId int) bool {
 	return email == "" || listId <= 0
 }

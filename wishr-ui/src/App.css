@@ -35,6 +35,27 @@ svg {
   text-align: center;
 }
 
+.trash:hover {
+  color: red;
+}
+
+.edit:hover {
+  color: rgb(0, 145, 255);
+}
+
+.swipe-action {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0px;
+  font-size: 12px;
+  font-weight: 500;
+  box-sizing: border-box;
+  color: #eee;
+  user-select: none;
+  justify-content: center;
+}
+
 .lists {
   display: flex;
   flex-direction: column;
@@ -56,13 +77,18 @@ svg {
   overflow-y: auto;
 }
 
+.more-bottom {
+  margin-bottom: 7px;
+}
+
 .list-title {
   display: flex;
+  width: 100%;
   justify-content: space-around;
   background-color: #e2e2e2;
   padding: 4px;
   gap: 2px;
-  margin-bottom: 7px;
+
   cursor: pointer;
   position: relative;
 }
@@ -126,15 +152,18 @@ svg {
 
 .list-add {
   padding: 10px 20px;
-  border-radius: 50px;
 }
 
 .entry-form {
   max-width: 250px;
-  margin: auto;
+  margin: 0 auto;
   box-shadow: 0px 0px 5px gray;
   padding: 15px;
   border-radius: 5px;
+}
+
+.entry-form form {
+  margin-top: 12px;
 }
 
 .entry-form .input-box {
@@ -178,18 +207,20 @@ svg {
 
 @keyframes unroll {
   from {
-    transform: scaleY(0);
+    transform: scaleY(0.25);
     transform-origin: top;
+    opacity: 0;
   }
 
   to {
     transform: scaleY(1);
     transform-origin: top;
+    opacity: 1;
   }
 }
 
-.unroll-item {
-  animation: unroll 0.25s ease-in-out;
+.unroll {
+  animation: unroll 0.35s ease-in-out;
   transform-origin: top;
 }
 

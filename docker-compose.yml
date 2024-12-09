@@ -1,8 +1,9 @@
-version: '3'
 services:
   ui:
     build:
       context: ./wishr-ui
+    volumes:
+      - /etc/ssl:/etc/ssl
     ports:
       - "3000:80" # Map container port to host port for UI
     depends_on:
@@ -14,6 +15,13 @@ services:
       - ./storage:/storage
     ports:
       - "3001:3001" # Map container port to host port for API
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
     depends_on:
       - postgres # Wait for db to be up
   postgres:
@@ -22,6 +30,6 @@ services:
     ports:
       - "3002:5432" # Map container port to host port
     environment:
-      POSTGRES_DB: wishr
-      POSTGRES_USER: apiuser
-      POSTGRES_PASSWORD: grespost
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
