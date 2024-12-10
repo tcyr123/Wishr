@@ -68,12 +68,37 @@ export default function Nav({ children }) {
         }
     };
 
+    const handleAvatarChange = (e) => {
+        if (!e.target?.files[0]) { return }
+        uploadAvatar(e.target.files[0]);
+    }
+
     const toggleNotifications = () => {
         setShowNavBox(current => current === 1 ? 0 : 1)
     }
 
     const toggleProfile = () => {
         setShowNavBox(current => current === 2 ? 0 : 2)
+    }
+
+    function uploadAvatar(file) {
+        const formData = new FormData();
+        formData.append('photo', file);
+
+        axios.post(`${API}/image`, formData, {
+            withCredentials: true,
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+            .then((response) => {
+                if (response.status === 200) {
+                    const picture = URL.createObjectURL(file)
+                    savePP(picture)
+                    setProfilePic(picture);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     function buildNotifications() {
@@ -97,9 +122,20 @@ export default function Nav({ children }) {
                 <div className="arrow arrow-prof"></div>
                 <div className="notification-box">
                     <h2>Profile</h2>
+                    <p key={user?.email}>{user?.username} - {user?.email}</p>
                     <div style={{ padding: "5px" }}>
-                        <p key={user?.email}>{user?.username} - {user?.email}</p>
-                        <button onClick={logout}>Logout</button>
+                        <label htmlFor="avatar_upload" className='button' >
+                            Modify Avatar
+                        </label>
+                        <input
+                            type="file"
+                            id="avatar_upload"
+                            name="avatar_upload"
+                            accept=".jpg, .jpeg, .png"
+                            style={{ display: "none" }}
+                            onChange={handleAvatarChange}
+                        />
+                        <button style={{ marginTop: "5%" }} onClick={logout}>Logout</button>
                     </div>
                 </div></div>
         )

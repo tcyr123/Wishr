@@ -72,18 +72,10 @@ func Signin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	// Create a new random session token
-	sessionToken := uuid.NewString()
-	expiresAt := time.Now().Add(120 * time.Second)
-
-	// Set the token in the session map, along with the user it represents
-	sessions[sessionToken] = Session{
-		Email:  user.Email,
-		Expiry: expiresAt,
-	}
+	sessionToken, expiresAt := createAndStoreToken(user.Email)
 
 	// Get the users data (name and photo reference) from db
-	var userInfo User
+	var userInfo UserDTO
 	err = db.QueryRow("SELECT email, username, photo from USERS where email = $1", user.Email).Scan(&userInfo.Email, &userInfo.Username, &userInfo.Photo)
 	if err != nil {
 		log.Println("Error with query: ", err)
@@ -100,6 +92,43 @@ func Signin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		SameSite: http.SameSiteLaxMode,
 	})
 	json.NewEncoder(w).Encode(userInfo)
+}
+
+func Register(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var user User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil || isUserInvalid(user) {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	salt, err := generateSalt(12)
+	if err != nil || isUserInvalid(user) {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	qry := "INSERT INTO users (email, username, salt, password) values ($1, $2, $3, $4)"
+
+	_, err = db.Exec(qry, user.Email, user.Username, salt, hashPassword(user.Password, salt))
+	if err != nil {
+		log.Println("Error with query: ", err)
+		http.Error(w, "Error with query", http.StatusInternalServerError)
+		return
+	}
+
+	sessionToken, expiresAt := createAndStoreToken(user.Email)
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    sessionToken,
+		Expires:  expiresAt,
+		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
+	})
+
+	createdUser := UserDTO{Email: user.Email, Username: user.Username, Photo: ""}
+	json.NewEncoder(w).Encode(createdUser)
 }
 
 func Refresh(w http.ResponseWriter, r *http.Request) {
@@ -129,15 +158,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If the previous session is valid, create a new session token
-	// See signin function for details on how this works
-	newSessionToken := uuid.NewString()
-	expiresAt := time.Now().Add(120 * time.Second)
-
-	sessions[newSessionToken] = Session{
-		Email:  userSession.Email,
-		Expiry: expiresAt,
-	}
+	newSessionToken, expiresAt := createAndStoreToken(userSession.Email)
 
 	// Delete the older session token
 	time.AfterFunc(10*time.Second, func() {
@@ -147,7 +168,7 @@ func Refresh(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session_token",
 		Value:    newSessionToken,
-		Expires:  time.Now().Add(120 * time.Second),
+		Expires:  expiresAt,
 		Path:     "/",
 		SameSite: http.SameSiteLaxMode,
 	})
@@ -238,4 +259,23 @@ func GetAllUserEmails(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	json.NewEncoder(w).Encode(totalUsers)
+}
+
+func createAndStoreToken(email string) (string, time.Time) {
+	// Create a new random session token
+	sessionToken := uuid.NewString()
+	expiresAt := time.Now().Add(120 * time.Second)
+
+	// Set the token in the session map, along with the user it represents
+	userSesh := Session{
+		Email:  email,
+		Expiry: expiresAt,
+	}
+	sessions[sessionToken] = userSesh
+
+	return sessionToken, expiresAt
+}
+
+func isUserInvalid(user User) bool {
+	return user.Email == "" || user.Username == "" || user.Password == ""
 }

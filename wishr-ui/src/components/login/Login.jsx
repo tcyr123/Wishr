@@ -7,7 +7,7 @@ import { useUser } from "../../contexts/UseUser";
 import "./Login.css";
 
 export default function Login() {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -15,15 +15,15 @@ export default function Login() {
     const navigate = useNavigate();
 
     const handleLogin = () => {
-        if (!username || !password) {
-            setError('Please provide both username and password.');
+        if (!email || !password) {
+            setError('Please provide both email and password.');
             return;
         }
         setLoading(true);
 
         axios.post(`${API}/login`, {
-            email: username,
-            password: password
+            email,
+            password
         }, { withCredentials: true })
             .then(response => {
                 login(response.data);
@@ -31,6 +31,7 @@ export default function Login() {
             })
             .catch(error => {
                 console.log(error);
+                setError('Incorrect email or password.')
             }).finally(() => {
                 setLoading(false);
             });
@@ -43,12 +44,12 @@ export default function Login() {
                 <h2>Login</h2>
                 <form>
                     <div className="input-box">
-                        <label htmlFor="username">Username:</label>
+                        <label htmlFor="email">Email:</label>
                         <input
-                            type="text"
-                            id="username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            type="email"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
                     <div className="input-box">
@@ -63,7 +64,7 @@ export default function Login() {
                     {error && <p className="error">{error}</p>}
                     <button type="button" onClick={handleLogin} disabled={loading}>Login</button>
                     <p>
-                        {"Don't have an account?"}
+                        {"Don't have an account?"} {' '}
                         <a className="btn-link" onClick={() => { navigate('/register') }}>
                             Register
                         </a>

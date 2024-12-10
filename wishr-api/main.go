@@ -32,6 +32,9 @@ func main() {
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		Signin(w, r, db)
 	})
+	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+		Register(w, r, db)
+	})
 	http.HandleFunc("/refresh", Refresh)
 	http.HandleFunc("/logout", Logout)
 
@@ -50,9 +53,19 @@ func main() {
 		}
 	})))
 
-	http.HandleFunc("/image", GetImageFromStorage)
+	http.HandleFunc("/image", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			GetImageFromStorage(w, r)
+		case http.MethodPost:
+			SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				SaveUserImage(w, r, db)
+			})).ServeHTTP(w, r)
+		default:
+			http.Error(w, "Unsupported HTTP method", http.StatusMethodNotAllowed)
+		}
+	})
 
-	// Users endpoint to retrieve emails
 	http.Handle("/users", SessionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:

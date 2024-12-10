@@ -37,7 +37,8 @@ h1 {
 }
 
 
-button {
+button,
+.button {
   border-radius: 5px;
   border: 1px solid transparent;
   color: #fff;

@@ -1,7 +1,10 @@
 package main
 
 import (
+	"database/sql"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -39,6 +42,89 @@ func getContentType(filename string) string {
 		log.Printf("Serving octet filetype since we could not support: %v", extention)
 		return "application/octet-stream" // Default to binary if not recognized
 	}
+}
+
+func SaveUserImage(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	err := r.ParseMultipartForm(10 << 20) // Limit upload size to 10MB
+	if err != nil {
+		http.Error(w, "Unable to parse form data", http.StatusBadRequest)
+		log.Printf("Error parsing form data: %v", err)
+		return
+	}
+
+	file, handler, err := r.FormFile("photo")
+	if err != nil {
+		http.Error(w, "Unable to retrieve the file", http.StatusBadRequest)
+		log.Printf("Error retrieving the file: %v", err)
+		return
+	}
+	defer file.Close()
+
+	storagePath := "/storage"
+	if _, err := os.Stat(storagePath); os.IsNotExist(err) {
+		// Create the directory if it doesn't exist
+		err := os.MkdirAll(storagePath, os.ModePerm)
+		if err != nil {
+			http.Error(w, "Failed to create storage directory", http.StatusInternalServerError)
+			log.Printf("Error creating storage directory: %v", err)
+			return
+		}
+	}
+
+	// Generate the file path
+	filePath := fmt.Sprintf("%s/%s", storagePath, handler.Filename)
+
+	// Save the file to the storage directory
+	dst, err := os.Create(filePath)
+	if err != nil {
+		http.Error(w, "Unable to save the file", http.StatusInternalServerError)
+		log.Printf("Error creating file: %v", err)
+		return
+	}
+	defer dst.Close()
+
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		http.Error(w, "Unable to write the file", http.StatusInternalServerError)
+		log.Printf("Error writing file: %v", err)
+		return
+	}
+
+	oldFilename := ""
+	qry := "SELECT COALESCE(photo, '') from users where email = $1"
+	err = db.QueryRow(qry, cookie_email).Scan(&oldFilename)
+	if err != nil {
+		log.Println("Error with query: ", err)
+		http.Error(w, "Error with query", http.StatusInternalServerError)
+		return
+	}
+
+	//Remove the users old photo to clear space
+	if oldFilename != "" {
+		oldFilePath := fmt.Sprintf("%s/%s", storagePath, oldFilename)
+		removeErr := os.Remove(oldFilePath)
+		if removeErr != nil {
+			log.Printf("Failed to remove file %s after query error: %v", oldFilePath, removeErr)
+		}
+	}
+
+	qry = "UPDATE users set photo = $1 where email = $2"
+	_, err = db.Exec(qry, handler.Filename, cookie_email)
+	if err != nil {
+		log.Println("(removing file) Error with query: ", err)
+		http.Error(w, "Error with query", http.StatusInternalServerError)
+		removeErr := os.Remove(filePath)
+		if removeErr != nil {
+			log.Printf("Failed to remove file %s after query error: %v", filePath, removeErr)
+		}
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	response := map[string]string{
+		"message": "File uploaded successfully"}
+	json.NewEncoder(w).Encode(response)
 }
 
 func GetImageFromStorage(w http.ResponseWriter, r *http.Request) {

@@ -1,5 +1,7 @@
 export const API = import.meta.env?.VITE_API_URL || "unknown_api"
 export const userEmail = "easton@gmail.com"
+export const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 
 
 // export const axiosInstance = axios.create({
@@ -43,4 +45,12 @@ export function formatDateNumbers(originalDate) {
     const ampm = date.getHours() >= 12 ? 'pm' : 'am';
 
     return `${month}/${day}/${year} ${hours}:${minutes}${ampm}`;
+}
+
+export function isStringEmpty(param) {
+    return !param || param.trim() === ""
+}
+
+export function containsEmptyString(paramArr) {
+    return paramArr.some(param => isStringEmpty(param));
 }
