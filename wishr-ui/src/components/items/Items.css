@@ -157,9 +157,6 @@
     align-items: center;
 }
 
-/* Adding Styling for Viewer Form */
-.viewer-entry-form {}
-
 /* When phone size or smaller */
 @media (max-width: 767px) {
     .items-page {

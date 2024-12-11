@@ -54,3 +54,13 @@ export function isStringEmpty(param) {
 export function containsEmptyString(paramArr) {
     return paramArr.some(param => isStringEmpty(param));
 }
+
+export function preventDefault(e) {
+    e.preventDefault();
+}
+
+export function onEnterPressed(e, callback) {
+    if (e.key === 'Enter') {
+        callback();
+    }
+}

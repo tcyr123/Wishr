@@ -334,22 +334,23 @@ export default function Items() {
                 buttons={[
                     {
                         title: 'Cancel',
-                        className: 'list-add inverse-btn',
+                        className: 'inverse-btn',
                         callbackFunction: () => { setViewerState("view") },
                     },
                     {
                         title: 'Save',
-                        className: 'list-add',
+                        className: '',
                         callbackFunction: () => { addViewer(); setViewerState("view") },
                     },
                 ]}
+                onOverlayClick={() => setAction("view")}
             />
         }
     }
 
     function buildAddItem() {
         if (action === "view") {
-            return <button onClick={() => { setAction("add") }} className='list-add'>Add Item +</button>
+            return <button onClick={() => { setAction("add") }}>Add Item +</button>
         } else if (action === "add") {
             return <TextInputsModal
                 headline="New Item"
@@ -382,18 +383,19 @@ export default function Items() {
                 buttons={[
                     {
                         title: 'Cancel',
-                        className: 'list-add inverse-btn',
+                        className: 'inverse-btn',
                         callbackFunction: () => setAction('view'),
                     },
                     {
                         title: 'Save',
-                        className: 'list-add',
+                        className: '',
                         callbackFunction: () => {
                             addItem();
                             setAction('view');
                         },
                     },
                 ]}
+                onOverlayClick={() => setAction("view")}
             />
         }
     }

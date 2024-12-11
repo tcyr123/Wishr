@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { confirmAlert } from 'react-confirm-alert';
 import { BiEditAlt, BiShow, BiTrashAlt } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,7 +13,7 @@ import {
 import 'react-swipeable-list/dist/styles.css';
 import './App.css';
 import TextInputsModal from './components/modals/TextInputsModal';
-import { API, formatDateNumbers } from './constants';
+import { API, formatDateNumbers, onEnterPressed } from './constants';
 import ScreenSizeContext from './contexts/ScreenSizeContext';
 import { useUser } from './contexts/UseUser';
 import useScreenSize from './hooks/useScreenSize';
@@ -21,7 +22,8 @@ function App() {
   const screenSize = useScreenSize();
   const [action, setAction] = useState('view');
   const [lists, setLists] = useState([])
-  const [newList, setNewList] = useState('');
+  const [focussedList, setFocussedList] = useState()
+  const [newListName, setNewListName] = useState('');
   const navigate = useNavigate();
   const { user } = useUser();
 
@@ -31,6 +33,22 @@ function App() {
 
   const handleListClick = (listInfo) => {
     navigate('/items', { state: { listInfo } })
+  }
+
+  const handleListDelete = (listInfo) => {
+    confirmAlert({
+      title: "Delete List",
+      message: `Are you sure you want to delete ${listInfo.title}`,
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => deleteList(listInfo.list_id)
+        },
+        {
+          label: "No"
+        }
+      ]
+    });
   }
 
   function getLists() {
@@ -46,18 +64,49 @@ function App() {
   }
 
   function addList() {
-    if (!newList) { return }
-    axios.post(`${API}/lists`, { title: newList }, {
+    if (!newListName) { return }
+    axios.post(`${API}/lists`, { title: newListName }, {
       withCredentials: true
     })
-      .then(response => {
+      .then(() => {
         //set a good message notification maybe
-        setNewList('')
+        setNewListName('')
         getLists()
       })
       .catch(error => {
         console.log(error);
       })
+  }
+
+  function editList() {
+    if (!newListName) { return }
+    axios.put(`${API}/lists`, { id: focussedList?.list_id, title: newListName }, {
+      withCredentials: true
+    })
+      .then(() => {
+        setNewListName('')
+        setFocussedList('')
+        getLists()
+      })
+      .catch(error => {
+        console.log(error);
+      })
+  }
+
+  function deleteList(listId) {
+    if (!listId) { return }
+    axios.delete(`${API}/lists`, {
+      data: {
+        id: listId,
+      },
+      withCredentials: true,
+    })
+      .then(() => {
+        getLists();
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   function buildLists(isMyList) {
@@ -74,11 +123,11 @@ function App() {
             <small>{listInfo.username}</small>
             <p>{listInfo.title}</p>
             <small>{formatDateNumbers(listInfo.creation_date)}</small>
-            <div className="relative-overlay">
-              {!isMyList || <div className="hidden-btn" onClick={(e) => { e.stopPropagation(); alert("todo: set up delete confirmation") }}><BiTrashAlt className="trash" /></div>}
-              {!isMyList || <div className="hidden-btn" onClick={(e) => { e.stopPropagation(); alert("todo: set up list name edit") }}><BiEditAlt className='edit' /></div>}
+            {isMobileView() ? null : <div className="relative-overlay">
+              {!isMyList || <div className="hidden-btn" onClick={(e) => { e.stopPropagation(); handleListDelete(listInfo) }}><BiTrashAlt className="trash" /></div>}
+              {!isMyList || <div className="hidden-btn" onClick={(e) => { e.stopPropagation(); prepareEdit(listInfo) }}><BiEditAlt className='edit' /></div>}
               <div className="hidden-btn"><BiShow /></div>
-            </div>
+            </div>}
           </div>
         );
       });
@@ -91,20 +140,22 @@ function App() {
       return <p>Empty</p>
     }
 
-    const leadingActions = () => (
+    const leadingActions = (listInfo) => (
       <LeadingActions>
-        <SwipeAction onClick={() => console.info('swipe action triggered')}>
-          <div className="swipe-action" style={{ backgroundColor: "orange" }}>Edit</div>
+        <SwipeAction onClick={() => { prepareEdit(listInfo) }}>
+          <div className="swipe-action-inner" style={{ backgroundColor: "orange" }}><BiEditAlt />
+          </div>
         </SwipeAction>
       </LeadingActions>
     );
 
-    const trailingActions = () => (
+    const trailingActions = (listInfo) => (
       <TrailingActions>
         <SwipeAction
-          onClick={() => console.info('swipe action triggered')}
+          onClick={() => { handleListDelete(listInfo) }}
         >
-          <div className="swipe-action" style={{ backgroundColor: "red" }}>Delete</div>
+          <div className="swipe-action-inner" style={{ backgroundColor: "red" }}><BiTrashAlt />
+          </div>
         </SwipeAction>
       </TrailingActions>
     );
@@ -117,8 +168,8 @@ function App() {
           <SwipeableListItem
             className='more-bottom noselect'
             key={listInfo.list_id}
-            leadingActions={leadingActions()}
-            trailingActions={trailingActions()}
+            leadingActions={leadingActions(listInfo)}
+            trailingActions={trailingActions(listInfo)}
             onClick={() => { handleListClick({ isMyList: isMyList, ...listInfo }) }}
           >
             <div className='list-title' key={listInfo.list_id}>
@@ -134,36 +185,42 @@ function App() {
       type={ListType.IOS} threshold={0.5}>{output}</SwipeableList> : <p>Empty</p>
   }
 
+  function prepareEdit(listInfo) {
+    setFocussedList(listInfo);
+    setAction("edit")
+  }
+
   function buildForm() {
-    if (action === "view") {
-      return <button onClick={() => { setAction("add") }} className='list-add'>New List +</button>
-    } else if (action === "add") {
-      return <TextInputsModal
-        headline="New List"
-        inputSections={[
-          {
-            labelValue: 'Title',
-            inputType: 'text',
-            id: 'viewerName',
-            value: newList,
-            placeholder: 'My List',
-            onChange: (e) => setNewList(e.target.value),
-          }
-        ]}
-        buttons={[
-          {
-            title: 'Cancel',
-            className: 'list-add inverse-btn',
-            callbackFunction: () => { setAction("view") },
-          },
-          {
-            title: 'Save',
-            className: 'list-add',
-            callbackFunction: () => { addList(); setAction("view") },
-          },
-        ]}
-      />
-    }
+    if (!["add", "edit"].includes(action)) { return }
+    let isEdit = action === "edit"
+    let callback = () => { isEdit ? editList() : addList(); setAction("view") }
+    return <TextInputsModal
+      headline={isEdit ? "Edit List" : "New List"}
+      inputSections={[
+        {
+          labelValue: 'Title',
+          inputType: 'text',
+          id: 'viewerName',
+          value: newListName,
+          placeholder: isEdit ? focussedList?.title : 'My List',
+          onKeyDown: (e) => onEnterPressed(e, callback),
+          onChange: (e) => setNewListName(e.target.value),
+        }
+      ]}
+      buttons={[
+        {
+          title: 'Cancel',
+          className: 'inverse-btn',
+          callbackFunction: () => { setAction("view") },
+        },
+        {
+          title: 'Save',
+          className: '',
+          callbackFunction: callback,
+        },
+      ]}
+      onOverlayClick={() => setAction("view")}
+    />
   }
 
   function isMobileView() {
@@ -178,6 +235,8 @@ function App() {
           <div className="lists" >
             <h2>My Lists</h2>
             <div className={!isMobileView() ? "card" : ""}>
+              <button className='add-btn' onClick={() => { setAction("add") }}>New List +</button>
+              {buildForm()}
               {isMobileView() ? buildSwipeLists(true) : buildLists(true)}
             </div >
           </div>
@@ -188,7 +247,6 @@ function App() {
             </div>
           </div>
         </div>
-        {buildForm()}
       </div>
     </ScreenSizeContext.Provider>
   )

@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/wishrlogo.png";
-import { API } from "../../constants";
+import { API, onEnterPressed, preventDefault } from "../../constants";
 import { useUser } from "../../contexts/UseUser";
 import "./Login.css";
 
@@ -42,13 +42,14 @@ export default function Login() {
             <img src={logo} alt="logo" className="logo" />
             <div className="card login-box">
                 <h2>Login</h2>
-                <form>
+                <form onSubmit={preventDefault}>
                     <div className="input-box">
                         <label htmlFor="email">Email:</label>
                         <input
                             type="email"
                             id="email"
                             value={email}
+                            onKeyDown={(e) => onEnterPressed(e, handleLogin)}
                             onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
@@ -58,6 +59,7 @@ export default function Login() {
                             type="password"
                             id="password"
                             value={password}
+                            onKeyDown={(e) => onEnterPressed(e, handleLogin)}
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>

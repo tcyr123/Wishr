@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from "../../assets/wishrlogo.png";
-import { API, containsEmptyString, emailPattern } from '../../constants';
+import { API, containsEmptyString, emailPattern, preventDefault } from '../../constants';
 import { useUser } from '../../contexts/UseUser';
 
 export default function Register() {
@@ -61,7 +61,7 @@ export default function Register() {
             <img src={logo} alt="logo" className="logo" />
             <div className="card login-box">
                 <h2>Register</h2>
-                <form>
+                <form onSubmit={preventDefault}>
                     <div className='input-box'>
                         <label htmlFor="newEmail">Email:</label>
                         <input

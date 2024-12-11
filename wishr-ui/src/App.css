@@ -35,25 +35,27 @@ svg {
   text-align: center;
 }
 
-.trash:hover {
+.trash:hover,
+.hidden-btn:hover .trash {
   color: red;
 }
 
-.edit:hover {
+.edit:hover,
+.hidden-btn:hover .edit {
   color: rgb(0, 145, 255);
 }
 
-.swipe-action {
+.swipe-action-inner {
   height: 100%;
   display: flex;
+  -webkit-box-align: center;
   align-items: center;
-  padding: 0px;
+  padding: 0 12px;
   font-size: 12px;
   font-weight: 500;
   box-sizing: border-box;
-  color: #eee;
+  color: rgb(238, 238, 238);
   user-select: none;
-  justify-content: center;
 }
 
 .lists {
@@ -150,25 +152,8 @@ svg {
   color: #fff;
 }
 
-.list-add {
-  padding: 10px 20px;
-}
-
-.entry-form {
-  max-width: 250px;
-  margin: 0 auto;
-  box-shadow: 0px 0px 5px gray;
-  padding: 15px;
-  border-radius: 5px;
-}
-
-.entry-form form {
-  margin-top: 12px;
-}
-
-.entry-form .input-box {
-  width: fit-content;
-  margin: auto auto 15px;
+.add-btn {
+  margin-bottom: 10px;
 }
 
 .btn-box {
@@ -205,23 +190,9 @@ svg {
   /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
 }
 
-@keyframes unroll {
-  from {
-    transform: scaleY(0.25);
-    transform-origin: top;
-    opacity: 0;
-  }
-
-  to {
-    transform: scaleY(1);
-    transform-origin: top;
-    opacity: 1;
-  }
-}
-
-.unroll {
-  animation: unroll 0.35s ease-in-out;
-  transform-origin: top;
+.react-confirm-alert .react-confirm-alert-body {
+  width: auto;
+  margin: 0 auto;
 }
 
 /* When tablet size or smaller */
@@ -255,5 +226,9 @@ svg {
   svg {
     width: 1rem;
     height: 1rem;
+  }
+
+  input {
+    font-size: 16px;
   }
 }

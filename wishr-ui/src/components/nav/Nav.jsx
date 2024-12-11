@@ -117,14 +117,22 @@ export default function Nav({ children }) {
     }
 
     function buildProfile() {
+        const lowPad = { padding: "4px" }
+        const inverseBtn = {
+            backgroundColor: 'white',
+            border: 'solid 1px #4080c6',
+            color: '#4080c6',
+            flex: "1",
+        }
+
         return (
             <div className="notification-box-container translated-center" ref={navBoxRef}>
                 <div className="arrow arrow-prof"></div>
                 <div className="notification-box">
                     <h2>Profile</h2>
                     <p key={user?.email}>{user?.username} - {user?.email}</p>
-                    <div style={{ padding: "5px" }}>
-                        <label htmlFor="avatar_upload" className='button' >
+                    <div style={lowPad} className='btn-box'>
+                        <label htmlFor="avatar_upload" className='button' style={{ ...inverseBtn, ...lowPad }} >
                             Modify Avatar
                         </label>
                         <input
@@ -135,7 +143,7 @@ export default function Nav({ children }) {
                             style={{ display: "none" }}
                             onChange={handleAvatarChange}
                         />
-                        <button style={{ marginTop: "5%" }} onClick={logout}>Logout</button>
+                        <button style={lowPad} onClick={logout}>Logout</button>
                     </div>
                 </div></div>
         )

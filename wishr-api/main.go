@@ -14,7 +14,7 @@ import (
 func main() {
 	// Create a new CORS handler
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{getEnv("ALLOWED_ORIGINS", "http://localhost:*")},
+		AllowedOrigins:   []string{getEnvVar("ALLOWED_ORIGINS", "http://localhost:*")},
 		AllowCredentials: true,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
