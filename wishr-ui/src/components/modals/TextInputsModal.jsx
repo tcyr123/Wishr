@@ -1,6 +1,11 @@
 import { preventDefault } from '../../constants';
 import './TextInputsModal.css';
-export default function TextInputsModal({ headline, inputSections = [], buttons = [], onOverlayClick }) {
+function TextInputsModal({
+    headline,
+    inputSections = [],
+    buttons = [],
+    onOverlayClick
+}) {
     return (
         <div className="modal-overlay fade-in" onClick={onOverlayClick}>
             <div
@@ -54,3 +59,5 @@ export default function TextInputsModal({ headline, inputSections = [], buttons 
         </div>
     );
 }
+
+export default TextInputsModal

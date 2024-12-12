@@ -20,7 +20,7 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	//DB Query for Items where list_id = list_id primary key
-	qry := "SELECT i.id, i.item_name,  COALESCE(i.item_description, ''),  COALESCE(i.link, ''), i.is_purchased,  COALESCE(i.assigned_user, ''), u.username, COALESCE(u.photo, '') FROM ITEMS i full join USERS u on i.assigned_user = u.email WHERE list_id = $1"
+	qry := "SELECT i.id, i.list_id, i.item_name,  COALESCE(i.item_description, '') as desc,  COALESCE(i.link, '') as link, i.is_purchased,  COALESCE(i.assigned_user, '') as asssigned, COALESCE(u.username, '') as user, COALESCE(u.photo, '') as photo FROM ITEMS i full join USERS u on i.assigned_user = u.email WHERE list_id = $1"
 
 	rows, err := db.Query(qry, list_id)
 	if err != nil {
@@ -32,7 +32,7 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	for rows.Next() {
 		var i Item
-		if err := rows.Scan(&i.ID, &i.ItemName, &i.ItemDescription, &i.Link, &i.IsPurchased, &i.AssignedUser.Email, &i.AssignedUser.Username, &i.AssignedUser.Photo); err != nil {
+		if err := rows.Scan(&i.ID, &i.ListID, &i.ItemName, &i.ItemDescription, &i.Link, &i.IsPurchased, &i.AssignedUser.Email, &i.AssignedUser.Username, &i.AssignedUser.Photo); err != nil {
 			log.Println(err)
 		}
 		items = append(items, i)
@@ -119,6 +119,10 @@ func EditItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	queryParams = append(queryParams, item.ID)
 	paramIndex++
 
+	queryBuffer.WriteString(fmt.Sprintf("AND list_id = (SELECT id FROM lists WHERE id = $%d and creator = $%d )", paramIndex, paramIndex+1))
+	queryParams = append(queryParams, item.ListID)
+	queryParams = append(queryParams, cookie_email)
+
 	_, err = db.Exec(queryBuffer.String(), queryParams...)
 	if err != nil {
 		log.Printf("Error executing query: %v", err)
@@ -137,15 +141,15 @@ func DeleteItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	if isItemIdInvalid(item.ID) {
+	if isItemIdInvalid(item.ID) || isListIdInvalid(item.ListID) {
 		http.Error(w, "Missing parameters", http.StatusBadRequest)
 		return
 	}
 
 	//added a user email check to make sure we cant delete others' Items
-	qry := "DELETE FROM items WHERE id = $1 AND id IN (SELECT id FROM lists WHERE creator = $2)"
+	qry := "DELETE FROM items WHERE id = $1 AND list_id = (SELECT id FROM lists WHERE id = $2 and creator = $3 )"
 
-	_, err = db.Exec(qry, item.ID, cookie_email)
+	_, err = db.Exec(qry, item.ID, item.ListID, cookie_email)
 	if err != nil {
 		log.Printf("Error executing query: %v", err)
 		http.Error(w, "Failed to delete message", http.StatusInternalServerError)

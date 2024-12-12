@@ -7,7 +7,7 @@
 .items-section {
     flex: 4;
     padding: 0 20px;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .items-container {
@@ -45,11 +45,6 @@
 
 .item-center {
     flex: 3;
-}
-
-.item-user {
-    margin-left: 50%;
-    transform: translate(-50%, 0);
 }
 
 .check {
@@ -151,6 +146,7 @@
 
 .strikethrough {
     text-decoration: line-through;
+    filter: contrast(0.01);
 }
 
 .viewer {
@@ -161,7 +157,7 @@
 @media (max-width: 767px) {
     .items-page {
         flex-direction: column;
-        gap: 75px;
+        gap: 25px;
         height: auto;
     }
 
@@ -177,5 +173,14 @@
 
     .input-with-button input {
         padding-right: 17%;
+    }
+
+    .item-left,
+    .item-right {
+        flex-direction: column;
+    }
+
+    .check {
+        margin: 0;
     }
 }

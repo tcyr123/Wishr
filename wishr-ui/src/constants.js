@@ -55,6 +55,10 @@ export function containsEmptyString(paramArr) {
     return paramArr.some(param => isStringEmpty(param));
 }
 
+export function isCompletelyEmpty(paramArr) {
+    return paramArr.every(param => isStringEmpty(param));
+}
+
 export function preventDefault(e) {
     e.preventDefault();
 }

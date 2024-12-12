@@ -5,7 +5,7 @@ import logo from "../../assets/wishrlogo.png";
 import { API, containsEmptyString, emailPattern, preventDefault } from '../../constants';
 import { useUser } from '../../contexts/UseUser';
 
-export default function Register() {
+function Register() {
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -113,3 +113,5 @@ export default function Register() {
         </div>
     );
 }
+
+export default Register

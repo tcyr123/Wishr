@@ -16,6 +16,7 @@ export function UserProvider({ children }) {
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
+            console.log('user was changed during inital load (from local storage)');
             setUser(JSON.parse(storedUser));
             refreshToken(); // Catches the case of a user refresh since we don't re-call the login function that starts the timer loop
         }
@@ -25,11 +26,13 @@ export function UserProvider({ children }) {
     const login = (userData) => {
         //will refresh token at right time
         startTokenRefreshInterval()
+        console.log('user was changed during login');
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
     };
 
     const savePP = (pp) => {
+        console.log('user was changed during savePP');
         setUser({ ...user, pp: pp });
         localStorage.setItem('user', JSON.stringify({ ...user, pp: pp }));
     };
@@ -82,6 +85,7 @@ export function UserProvider({ children }) {
     };
 
     const wipeout = () => {
+        console.log('user was changed during wipeout');
         setUser(null);
         localStorage.removeItem('user');
         Cookies.remove('session_token');

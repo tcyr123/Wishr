@@ -8,12 +8,13 @@ import { API } from "../../constants";
 import { useUser } from '../../contexts/UseUser';
 import "./Nav.css";
 
-export default function Nav({ children }) {
+function Nav({ children }) {
     const { user, savePP, logout } = useUser();
     const [profilePic, setProfilePic] = useState(user?.pp)
     const [showNavBox, setShowNavBox] = useState(0)
     const navigate = useNavigate();
-    const navBoxRef = useRef(null);
+    const previousUser = useRef();
+    const navBoxRef = useRef();
     const [notifications, setNotifications] = useState([
         { id: 1, text: "Welcome! This is your notifications panel." },
         { id: 2, text: "TCyr shared a list with you\n\"Taylor's Christmas List 2023\"" },
@@ -30,7 +31,14 @@ export default function Nav({ children }) {
 
     useEffect(() => {
         console.log('user is', user);
+
         if (!profilePic && user && user.photo) {
+            //no need to re-run this when users local photo changes
+            if (user.pp && previousUser.current?.pp === user.pp) {
+                console.log('users local pp was same. Not calling remote pp');
+                return
+            }
+
             axios.get(`${API}/image`, {
                 params: {
                     photo: user.photo
@@ -46,6 +54,7 @@ export default function Nav({ children }) {
                     console.log(error);
                 });
         }
+        previousUser.current = user;
     }, [user]);
 
     useEffect(() => {
@@ -173,3 +182,5 @@ export default function Nav({ children }) {
     </>
     )
 }
+
+export default Nav

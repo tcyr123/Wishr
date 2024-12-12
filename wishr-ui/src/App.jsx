@@ -13,7 +13,7 @@ import {
 import 'react-swipeable-list/dist/styles.css';
 import './App.css';
 import TextInputsModal from './components/modals/TextInputsModal';
-import { API, formatDateNumbers, onEnterPressed } from './constants';
+import { API, formatDateNumbers, isStringEmpty, onEnterPressed } from './constants';
 import ScreenSizeContext from './contexts/ScreenSizeContext';
 import { useUser } from './contexts/UseUser';
 import useScreenSize from './hooks/useScreenSize';
@@ -85,7 +85,7 @@ function App() {
     })
       .then(() => {
         setNewListName('')
-        setFocussedList('')
+        setFocussedList()
         getLists()
       })
       .catch(error => {
@@ -123,11 +123,15 @@ function App() {
             <small>{listInfo.username}</small>
             <p>{listInfo.title}</p>
             <small>{formatDateNumbers(listInfo.creation_date)}</small>
-            {isMobileView() ? null : <div className="relative-overlay">
-              {!isMyList || <div className="hidden-btn" onClick={(e) => { e.stopPropagation(); handleListDelete(listInfo) }}><BiTrashAlt className="trash" /></div>}
-              {!isMyList || <div className="hidden-btn" onClick={(e) => { e.stopPropagation(); prepareEdit(listInfo) }}><BiEditAlt className='edit' /></div>}
-              <div className="hidden-btn"><BiShow /></div>
-            </div>}
+
+            {isMobileView() ? null :
+              <div className="relative-overlay">
+                {!isMyList || <div className="hidden-btn" onClick={(e) => { e.stopPropagation(); handleListDelete(listInfo) }}><BiTrashAlt className="trash" /></div>}
+                {!isMyList || <div className="hidden-btn" onClick={(e) => { e.stopPropagation(); prepareEdit(listInfo) }}><BiEditAlt className='edit' /></div>}
+                <div className="hidden-btn"><BiShow /></div>
+              </div>
+            }
+
           </div>
         );
       });
@@ -192,17 +196,24 @@ function App() {
 
   function buildForm() {
     if (!["add", "edit"].includes(action)) { return }
+
     let isEdit = action === "edit"
     let callback = () => { isEdit ? editList() : addList(); setAction("view") }
+    let cancelCallback = () => { setNewListName(''); setAction("view") }
+
+    if (isEdit && isStringEmpty(newListName)) {
+      setNewListName(focussedList?.title)
+    }
+
     return <TextInputsModal
-      headline={isEdit ? "Edit List" : "New List"}
+      headline={isEdit ? "Edit List" : "Add List"}
       inputSections={[
         {
           labelValue: 'Title',
           inputType: 'text',
           id: 'viewerName',
           value: newListName,
-          placeholder: isEdit ? focussedList?.title : 'My List',
+          placeholder: 'My List',
           onKeyDown: (e) => onEnterPressed(e, callback),
           onChange: (e) => setNewListName(e.target.value),
         }
@@ -211,7 +222,7 @@ function App() {
         {
           title: 'Cancel',
           className: 'inverse-btn',
-          callbackFunction: () => { setAction("view") },
+          callbackFunction: cancelCallback,
         },
         {
           title: 'Save',
@@ -219,7 +230,7 @@ function App() {
           callbackFunction: callback,
         },
       ]}
-      onOverlayClick={() => setAction("view")}
+      onOverlayClick={cancelCallback}
     />
   }
 
@@ -235,7 +246,7 @@ function App() {
           <div className="lists" >
             <h2>My Lists</h2>
             <div className={!isMobileView() ? "card" : ""}>
-              <button className='add-btn' onClick={() => { setAction("add") }}>New List +</button>
+              <button style={{ marginBottom: "10px" }} onClick={() => { setAction("add") }}>Add List +</button>
               {buildForm()}
               {isMobileView() ? buildSwipeLists(true) : buildLists(true)}
             </div >

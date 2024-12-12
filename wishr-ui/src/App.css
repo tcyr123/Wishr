@@ -90,7 +90,7 @@ svg {
   background-color: #e2e2e2;
   padding: 4px;
   gap: 2px;
-
+  box-sizing: border-box;
   cursor: pointer;
   position: relative;
 }
@@ -152,16 +152,16 @@ svg {
   color: #fff;
 }
 
-.add-btn {
-  margin-bottom: 10px;
-}
-
 .btn-box {
   display: flex;
   gap: 10px;
 }
 
 .btn-box button {
+  flex: 1;
+}
+
+.flex-1 {
   flex: 1;
 }
 
@@ -207,10 +207,7 @@ svg {
 
   .lists {
     width: unset;
-  }
-
-  .lists:nth-child(2) {
-    padding-top: 50px;
+    padding: 0 5px;
   }
 }
 

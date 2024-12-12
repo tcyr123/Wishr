@@ -6,7 +6,7 @@ import { API, onEnterPressed, preventDefault } from "../../constants";
 import { useUser } from "../../contexts/UseUser";
 import "./Login.css";
 
-export default function Login() {
+function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -76,3 +76,5 @@ export default function Login() {
         </div>
     )
 }
+
+export default Login
