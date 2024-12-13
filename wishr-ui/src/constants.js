@@ -1,8 +1,5 @@
 export const API = import.meta.env?.VITE_API_URL || "unknown_api"
-export const userEmail = "easton@gmail.com"
 export const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
 
 // export const axiosInstance = axios.create({
 //     withCredentials: true,
@@ -45,6 +42,31 @@ export function formatDateNumbers(originalDate) {
     const ampm = date.getHours() >= 12 ? 'pm' : 'am';
 
     return `${month}/${day}/${year} ${hours}:${minutes}${ampm}`;
+}
+
+// set an objects value from an event. For nested objects use dot notation
+export function handleFieldChange(event, path, setter) {
+    let value = event.target.value;
+    if (!event.target.useValue && event.target.type === "checkbox") {
+        value = event.target.checked;
+    }
+
+    setter(current => {
+        const updateNested = (obj, pathArray) => {
+            //basic set if we aren't dealing with nested objects
+            if (pathArray.length === 1) {
+                return { ...obj, [pathArray[0]]: value };
+            }
+
+            const [key, ...rest] = pathArray;
+            return {
+                ...obj,
+                [key]: updateNested(obj[key] || {}, rest),
+            };
+        };
+
+        return updateNested(current, path.split('.'));
+    });
 }
 
 export function isStringEmpty(param) {

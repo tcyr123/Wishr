@@ -20,7 +20,7 @@ func GetItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	//DB Query for Items where list_id = list_id primary key
-	qry := "SELECT i.id, i.list_id, i.item_name,  COALESCE(i.item_description, '') as desc,  COALESCE(i.link, '') as link, i.is_purchased,  COALESCE(i.assigned_user, '') as asssigned, COALESCE(u.username, '') as user, COALESCE(u.photo, '') as photo FROM ITEMS i full join USERS u on i.assigned_user = u.email WHERE list_id = $1"
+	qry := "SELECT i.id, i.list_id, i.item_name,  COALESCE(i.item_description, '') as desc,  COALESCE(i.link, '') as link, i.is_purchased,  COALESCE(i.assigned_user, '') as asssigned, COALESCE(u.username, '') as user, COALESCE(u.photo, '') as photo FROM ITEMS i full join USERS u on i.assigned_user = u.email WHERE list_id = $1 ORDER BY i.id asc"
 
 	rows, err := db.Query(qry, list_id)
 	if err != nil {
@@ -70,6 +70,7 @@ func AddItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 func EditItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var item Item
+	var isAssumedOwner bool
 	err := json.NewDecoder(r.Body).Decode(&item)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -88,40 +89,47 @@ func EditItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var queryParams []interface{}
 	paramIndex := 1
 	if item.ItemName != "" {
+		isAssumedOwner = true
 		queryBuffer.WriteString(fmt.Sprintf(", item_name = $%d ", paramIndex))
 		queryParams = append(queryParams, item.ItemName)
 		paramIndex++
 	}
-	// more ifs here for other parameters
 	if item.ItemDescription != "" {
+		isAssumedOwner = true
 		queryBuffer.WriteString(fmt.Sprintf(", item_description = $%d ", paramIndex))
 		queryParams = append(queryParams, item.ItemDescription)
 		paramIndex++
 	}
 	if item.Link != "" {
+		isAssumedOwner = true
 		queryBuffer.WriteString(fmt.Sprintf(", link = $%d ", paramIndex))
 		queryParams = append(queryParams, item.Link)
 		paramIndex++
 	}
+
 	if item.IsPurchased != nil {
+		isAssumedOwner = false
 		queryBuffer.WriteString(fmt.Sprintf(", is_purchased = $%d ", paramIndex))
 		queryParams = append(queryParams, *item.IsPurchased)
 		paramIndex++
 	}
 	if item.AssignedUser.Email != "" {
+		isAssumedOwner = false
 		queryBuffer.WriteString(fmt.Sprintf(", assigned_user = $%d ", paramIndex))
 		queryParams = append(queryParams, item.AssignedUser.Email)
 		paramIndex++
 	}
 
-	// Using user email to verify we aren't updating other' Items
 	queryBuffer.WriteString(fmt.Sprintf("WHERE id = $%d ", paramIndex))
 	queryParams = append(queryParams, item.ID)
 	paramIndex++
 
-	queryBuffer.WriteString(fmt.Sprintf("AND list_id = (SELECT id FROM lists WHERE id = $%d and creator = $%d )", paramIndex, paramIndex+1))
-	queryParams = append(queryParams, item.ListID)
-	queryParams = append(queryParams, cookie_email)
+	// Using user email to verify we aren't updating others' Items
+	if isAssumedOwner {
+		queryBuffer.WriteString(fmt.Sprintf("AND list_id = (SELECT id FROM lists WHERE id = $%d and creator = $%d )", paramIndex, paramIndex+1))
+		queryParams = append(queryParams, item.ListID)
+		queryParams = append(queryParams, cookie_email)
+	}
 
 	_, err = db.Exec(queryBuffer.String(), queryParams...)
 	if err != nil {

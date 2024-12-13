@@ -1,5 +1,4 @@
 "SHARED LIST" TODOS:
-• Add Functionality to Item Assignment/Unassignment/Purchased Section (prompt)
 • Add Functionality to Read/Write in the Discussion
 
 NAV TODOS:
@@ -18,8 +17,8 @@ Working towards the MVP being v1.0.0, so in between now and then the breakdown w
 ✅ v0.9.0 [Pre-MVP] = add functionality to register (use standard email regex)
 ✅ v0.9.1 = List delete and name edit
 ✅ v0.9.2 = Item delete and edit
-⚪ v0.9.3 = assignment/unassignment of self to items
-⚪ v0.9.4 = marking assigned task as purchased (and unmarking in the case of accidental mark)
+✅ v0.9.3 = assignment/unassignment of self to items
+✅ v0.9.4 = marking assigned task as purchased (and unmarking in the case of accidental mark)
 ⚪ v0.9.5 = add messages to discussion + reloading discussion on a timer(mvp) or a socket(preferred)
 ⚪ v0.9.6 = backup db and images through volumes to host machine & boot up DB from backup if existent
 ⚪ v0.9.7+ = minor UI/UX makeovers, code cleanup, better logging, etc

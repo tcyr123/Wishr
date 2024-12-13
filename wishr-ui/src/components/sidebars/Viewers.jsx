@@ -110,6 +110,7 @@ function Viewers({ listId }) {
         if (viewerState === "view") {
             return <button onClick={() => { setViewerState("add") }} className='viewer-add'><BiSolidUserPlus /> Add Viewer</button>
         } else if (viewerState === "add") {
+            const cancelCallback = () => { setViewerState("view") }
             return <TextInputsModal
                 headline="Share List"
                 inputSections={[
@@ -127,7 +128,7 @@ function Viewers({ listId }) {
                     {
                         title: 'Cancel',
                         className: 'inverse-btn',
-                        callbackFunction: () => { setViewerState("view") },
+                        callbackFunction: cancelCallback,
                     },
                     {
                         title: 'Save',
@@ -135,7 +136,7 @@ function Viewers({ listId }) {
                         callbackFunction: () => { addViewer(); setViewerState("view") },
                     },
                 ]}
-                onOverlayClick={() => alert("todo: handle overlay click in viewers")}
+                onOverlayClick={cancelCallback}
             />
         }
     }

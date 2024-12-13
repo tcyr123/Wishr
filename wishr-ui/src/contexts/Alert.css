@@ -1,0 +1,35 @@
+.alert-container {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  max-height: 10vh;
+  overflow: hidden;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+.alert {
+  margin: 5px 0;
+  padding: 10px 20px;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 16px;
+  min-width: 200px;
+  text-align: center;
+  animation: fade-in 0.25s ease-in-out;
+}
+
+.alert.success {
+  background-color: #4caf50;
+  /* Green */
+}
+
+.alert.error {
+  background-color: #f44336;
+  /* Red */
+}
+
+.alert.warning {
+  background-color: #ff9800;
+  /* Orange */
+}

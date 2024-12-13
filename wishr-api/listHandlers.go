@@ -13,7 +13,7 @@ func GetListsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var lists []Lists
 
 	// Query for shared and owned lists
-	qry := "SELECT id, title, creator, creation_date, username FROM shared FULL JOIN lists ON lists.id = shared.list_id FULL JOIN users ON users.email = lists.creator WHERE creator = $1 OR shared_user = $1 GROUP BY id, username"
+	qry := "SELECT id, title, creator, creation_date, username FROM shared FULL JOIN lists ON lists.id = shared.list_id FULL JOIN users ON users.email = lists.creator WHERE creator = $1 OR shared_user = $1 GROUP BY id, username ORDER BY creation_date asc"
 
 	// Contains list_id and DB Query. email comes from the request's cookie info
 	rows, err := db.Query(qry, cookie_email)

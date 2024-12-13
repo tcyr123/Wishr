@@ -19,8 +19,10 @@ function TextInputsModal({
                             <div key={index} className="input-box">
                                 <label htmlFor={section.id}>{section.labelValue}:</label>
                                 <input
-                                    autoFocus={index === 0} //focus first input
+                                    //focus first input except on checkboxes
+                                    autoFocus={section.inputType != "checkbox" && index === 0}
                                     type={section.inputType}
+                                    checked={section.value || false}
                                     id={section.id}
                                     list={section.labelValue}
                                     autoComplete="off"
@@ -29,6 +31,7 @@ function TextInputsModal({
                                     onKeyDown={(e) => section.onKeyDown && section.onKeyDown(e)}
                                     onChange={(e) => section.onChange && section.onChange(e)}
                                 />
+
                                 {section.textList ?
                                     <datalist id={section.labelValue}>
                                         {section.textList.map((option) =>
