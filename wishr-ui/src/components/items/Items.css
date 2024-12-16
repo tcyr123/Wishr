@@ -73,6 +73,7 @@
 .messages-container {
     overflow-y: auto;
     padding: 7px;
+    margin-bottom: 15%;
 }
 
 .message {

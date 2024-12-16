@@ -287,7 +287,7 @@ function Items() {
             return
         }
 
-        let callback = () => { editItemAssignment() }
+        let callback = () => { editItemAssignment(); setAction('view') }
         let cancelCallback = () => { setAction('view') }
 
         return <TextInputsModal

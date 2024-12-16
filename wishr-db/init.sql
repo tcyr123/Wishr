@@ -19,16 +19,16 @@ CREATE TABLE LISTS (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     creator VARCHAR(255) NOT NULL REFERENCES USERS(email),
-    creation_date TIMESTAMP NOT NULL
+    creation_date TIMESTAMPTZ NOT NULL
 );
 
 -- LISTS table test data
 INSERT INTO LISTS (id, title, creator, creation_date)
 VALUES
-    (1, 'Taylor''s Christmas List 2023', 'taylor@gmail.com', '2023-05-24 15:57:00'),
-    (2, 'Birthday 2022', 'easton@gmail.com', '2023-03-23 13:22:00'),
-    (3, 'Jason/Kelsie''s Wedding', 'easton@gmail.com', '2023-05-18 21:12:00'),
-    (4, 'Easton''s Christmas List', 'easton@gmail.com', '2023-06-27 13:52:00');
+    (1, 'Taylor''s Christmas List 2023', 'taylor@gmail.com', '2023-05-24 15:57:00' AT TIME ZONE 'CST'),
+    (2, 'Birthday 2022', 'easton@gmail.com', '2023-03-23 13:22:00' AT TIME ZONE 'CST'),
+    (3, 'Jason/Kelsie''s Wedding', 'easton@gmail.com', '2023-05-18 21:12:00' AT TIME ZONE 'CST'),
+    (4, 'Easton''s Christmas List', 'easton@gmail.com', '2023-06-27 13:52:00' AT TIME ZONE 'CST');
 
 -- ITEMS table
 CREATE TABLE ITEMS (
@@ -68,17 +68,17 @@ CREATE TABLE MESSAGES (
     id SERIAL PRIMARY KEY,
     list_id INTEGER NOT NULL REFERENCES LISTS(id),
     user_email VARCHAR(255) NOT NULL REFERENCES USERS(email),
-    date TIMESTAMP NOT NULL,
+    date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     message TEXT NOT NULL
 );
 
 -- MESSAGES table test data
 INSERT INTO MESSAGES (id, list_id, user_email, date, message)
 VALUES
-    (1, 1, 'easton@gmail.com', '2023-08-01 14:54:00', 'I can get two gifts, but not the cleats! I''m waiting on my next paycheck for the second gift though...'),
-    (2, 1, 'troy@gmail.com', '2023-08-01 14:58:00', 'I just bought the cleats, no worries!'),
-    (3, 1, 'easton@gmail.com', '2023-08-01 15:10:00', 'Awesome! I hope someone can get the rest.'),
-    (4, 2, 'troy@gmail.com', '2023-08-02 14:58:00', 'This is borderline a reddit clone.');
+    (1, 1, 'easton@gmail.com', '2023-08-01 14:54:00' AT TIME ZONE 'CST', 'I can get two gifts, but not the cleats! I''m waiting on my next paycheck for the second gift though...'),
+    (2, 1, 'troy@gmail.com', '2023-08-01 14:58:00' AT TIME ZONE 'CST', 'I just bought the cleats, no worries!'),
+    (3, 1, 'easton@gmail.com', '2023-08-01 15:10:00' AT TIME ZONE 'CST', 'Awesome! I hope someone can get the rest.'),
+    (4, 2, 'troy@gmail.com', '2023-08-02 14:58:00' AT TIME ZONE 'CST', 'This is borderline a reddit clone.');
 
 
 -- Indexes

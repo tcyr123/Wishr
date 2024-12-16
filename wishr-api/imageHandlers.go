@@ -45,7 +45,7 @@ func SaveUserImage(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 	defer file.Close()
 
-	storagePath := "/storage"
+	storagePath := fmt.Sprintf("/storage/%s", cookie_email)
 	if _, err := os.Stat(storagePath); os.IsNotExist(err) {
 		// Create the directory if it doesn't exist
 		err := os.MkdirAll(storagePath, os.ModePerm)
@@ -114,8 +114,8 @@ func SaveUserImage(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 func GetImageFromStorage(w http.ResponseWriter, r *http.Request) {
 	photoFilename := r.URL.Query().Get("photo")
-	storagePath := "/storage"
-	imagePath := storagePath + "/" + photoFilename
+	storagePath := fmt.Sprintf("/storage/%s", cookie_email)
+	imagePath := fmt.Sprintf("%s/%s", storagePath, photoFilename)
 	if _, err := os.Stat(imagePath); os.IsNotExist(err) {
 		files, dirErr := os.ReadDir(storagePath)
 		if dirErr != nil {

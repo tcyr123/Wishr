@@ -57,3 +57,11 @@ func isItemIdInvalid(itemId int) bool {
 func isViewerStructInvalid(email string, listId int) bool {
 	return email == "" || listId <= 0
 }
+
+func isMessageInvalid(message Message) bool {
+	return message.Message == "" || message.ListID <= 0
+}
+
+func isUserInvalid(user User) bool {
+	return user.Email == "" || user.Username == "" || user.Password == ""
+}

@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	_ "github.com/lib/pq"
+	"golang.org/x/net/websocket"
 
 	"github.com/rs/cors"
 )
@@ -81,10 +82,10 @@ func main() {
 			GetMessagesHandler(w, r, db)
 		case http.MethodPost:
 			AddMessagesHandler(w, r, db)
-		case http.MethodDelete:
-			DeleteMessagesHandler(w, r, db)
-		case http.MethodPut:
-			EditMessagesHandler(w, r, db)
+		// case http.MethodDelete:
+		// 	DeleteMessagesHandler(w, r, db)
+		// case http.MethodPut:
+		// 	EditMessagesHandler(w, r, db)
 		default:
 			http.Error(w, "Unsupported HTTP method", http.StatusMethodNotAllowed)
 		}
@@ -118,6 +119,10 @@ func main() {
 		}
 	})))
 
+	http.Handle("/ws/messages", WebSocketSessionMiddleware(func(ws *websocket.Conn, r *http.Request) {
+		handleWebSocketMessages(ws, r, db)
+	}))
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Wishr API is running!")
 	})
@@ -127,9 +132,6 @@ func main() {
 	http.ListenAndServe(":3001", handler)
 }
 
-func loggingMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Method: %s, URL: %s, RemoteAddr: %s", r.Method, r.URL.String(), r.RemoteAddr)
-		next.ServeHTTP(w, r)
-	})
+func init() {
+	go broadcastMessages()
 }

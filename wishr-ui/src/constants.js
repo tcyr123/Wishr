@@ -69,6 +69,17 @@ export function handleFieldChange(event, path, setter) {
     });
 }
 
+export async function websocketDataToJSON(event) {
+    if (event.data instanceof Blob) {
+        // Convert the Blob to text
+        const textData = await event.data.text();
+        return JSON.parse(textData);
+    } else {
+        // Parse directly if it's already a string
+        return JSON.parse(event.data);
+    }
+}
+
 export function isStringEmpty(param) {
     return !param || param.trim() === ""
 }

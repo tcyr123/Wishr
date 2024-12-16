@@ -8,6 +8,7 @@ services:
       - "3000:80" # Map container port to host port for UI
     depends_on:
       - api # Wait for api to be up
+    restart: unless-stopped
   api:
     build:
       context: ./wishr-api
@@ -24,6 +25,7 @@ services:
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
     depends_on:
       - postgres # Wait for db to be up
+    restart: unless-stopped
   postgres:
     build:
       context: ./wishr-db
@@ -33,3 +35,4 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    restart: unless-stopped

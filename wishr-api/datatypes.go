@@ -44,12 +44,11 @@ type ViewerDTO struct {
 }
 
 type Message struct {
-	ID        int       `json:"id"`
-	ListID    int       `json:"list_id"`
-	UserEmail string    `json:"user_email"`
-	UserInfo  UserDTO   `json:"user_info"`
-	Date      time.Time `json:"date"`
-	Message   string    `json:"message"`
+	ID       int       `json:"id"`
+	ListID   int       `json:"list_id"`
+	UserInfo UserDTO   `json:"user_info"`
+	Date     time.Time `json:"date"`
+	Message  string    `json:"message"`
 }
 
 type Session struct {
@@ -64,4 +63,9 @@ type Lists struct {
 	CreationDate time.Time `json:"creation_date"`
 	SharedUser   string    `json:"shared_user"`
 	Username     string    `json:"username"`
+}
+
+type WSMessage[T any] struct {
+	MessageType string `json:"message_type"`
+	Data        T      `json:"data"`
 }

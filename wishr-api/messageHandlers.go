@@ -1,10 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 )
@@ -18,22 +16,10 @@ func GetMessagesHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	qry := "SELECT m.id, m.list_id, m.user_email, m.date, m.message, u.username, u.photo FROM MESSAGES m join USERS u on m.user_email = u.email WHERE m.list_id = $1"
-
-	rows, err := db.Query(qry, list_id)
+	messages, err := getMessagesFromDB(list_id, db)
 	if err != nil {
-		log.Println("Error with query: ", err)
 		http.Error(w, "Error with query", http.StatusInternalServerError)
 		return
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var m Message
-		if err := rows.Scan(&m.ID, &m.ListID, &m.UserEmail, &m.Date, &m.Message, &m.UserInfo.Username, &m.UserInfo.Photo); err != nil {
-			log.Println(err)
-		}
-		messages = append(messages, m)
 	}
 
 	json.NewEncoder(w).Encode(messages)
@@ -47,25 +33,22 @@ func AddMessagesHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	if message.Message == "" || message.ListID <= 0 {
+	if isMessageInvalid(message) {
 		http.Error(w, "Missing parameters", http.StatusBadRequest)
 		return
 	}
 
-	qry := "INSERT INTO MESSAGES (list_id, user_email, date, message) values ($1, $2, now(), $3) RETURNING id"
-
-	var insertedID int
-	err = db.QueryRow(qry, message.ListID, cookie_email, message.Message).Scan(&insertedID)
+	insertedID, err := saveMessageToDB(message, db)
 	if err != nil {
-		log.Printf("Error executing query: %v", err)
 		http.Error(w, "Failed to insert message", http.StatusInternalServerError)
-		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]int{"id": insertedID})
 }
 
+//Advanced features we are not ready for yet
+/*
 func EditMessagesHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var message Message
 	err := json.NewDecoder(r.Body).Decode(&message)
@@ -134,4 +117,41 @@ func DeleteMessagesHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+*/
+
+func getMessagesFromDB(listID string, db *sql.DB) ([]Message, error) {
+	var messages []Message
+
+	qry := "SELECT m.id, m.list_id, m.user_email, m.date, m.message, u.username, u.photo FROM MESSAGES m join USERS u on m.user_email = u.email WHERE m.list_id = $1"
+
+	rows, err := db.Query(qry, listID)
+	if err != nil {
+		log.Println("Error with query: ", err)
+		return messages, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var m Message
+		if err := rows.Scan(&m.ID, &m.ListID, &m.UserInfo.Email, &m.Date, &m.Message, &m.UserInfo.Username, &m.UserInfo.Photo); err != nil {
+			log.Println(err)
+		}
+		messages = append(messages, m)
+	}
+
+	return messages, nil
+}
+
+func saveMessageToDB(message Message, db *sql.DB) (int, error) {
+	qry := "INSERT INTO MESSAGES (list_id, user_email, message) values ($1, $2, $3) RETURNING id"
+
+	var insertedID int
+	err := db.QueryRow(qry, message.ListID, cookie_email, message.Message).Scan(&insertedID)
+	if err != nil {
+		log.Printf("Error executing query: %v", err)
+		return -1, err
+	}
+
+	return insertedID, nil
 }

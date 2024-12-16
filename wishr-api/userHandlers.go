@@ -10,53 +10,7 @@ import (
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/google/uuid"
 )
-
-// ----- USER LOGIN AND SESSIONS -----
-var sessions = map[string]Session{} // stores the users sessions. Use redis DB in prod
-var cookie_email string
-
-func (s Session) isExpired() bool {
-	return s.Expiry.Before(time.Now())
-}
-
-func SessionMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c, err := r.Cookie("session_token")
-		if err != nil {
-			if err == http.ErrNoCookie {
-				log.Println("Cookie completely missing from request")
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		sessionToken := c.Value
-
-		userSession, exists := sessions[sessionToken]
-		if !exists {
-			log.Printf("Session token %v does not exist", sessionToken)
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		if userSession.isExpired() {
-			log.Printf("User Session for %v expired at %v", userSession.Email, userSession.Expiry)
-			delete(sessions, sessionToken)
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		//set a global variable for this requet
-		cookie_email = userSession.Email
-
-		// Call the next handler in the chain
-		next.ServeHTTP(w, r)
-	})
-}
 
 func Signin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var user User
@@ -259,23 +213,4 @@ func GetAllUserEmails(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	json.NewEncoder(w).Encode(totalUsers)
-}
-
-func createAndStoreToken(email string) (string, time.Time) {
-	// Create a new random session token
-	sessionToken := uuid.NewString()
-	expiresAt := time.Now().Add(120 * time.Second)
-
-	// Set the token in the session map, along with the user it represents
-	userSesh := Session{
-		Email:  email,
-		Expiry: expiresAt,
-	}
-	sessions[sessionToken] = userSesh
-
-	return sessionToken, expiresAt
-}
-
-func isUserInvalid(user User) bool {
-	return user.Email == "" || user.Username == "" || user.Password == ""
 }
