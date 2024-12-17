@@ -17,7 +17,7 @@ Working towards the MVP being v1.0.0, so in between now and then the breakdown w
 ✅ v0.9.3 = assignment/unassignment of self to items
 ✅ v0.9.4 = marking assigned task as purchased (and unmarking in the case of accidental mark)
 ✅ v0.9.5 = add messages to discussion + reloading discussion on a timer(mvp) or a socket(preferred)
-⚪ v0.9.6 = backup db and images through volumes to host machine & boot up DB from backup if existent
+✅ v0.9.6 = backup db and images through volumes to host machine & boot up DB from backup if existent
 ⚪ v0.9.7+ = minor UI/UX makeovers, code cleanup, better logging, etc
 
 ⚪ v1.0.0 [MVP/Beta] = useable by family/friends in a prod environment

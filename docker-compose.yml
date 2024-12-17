@@ -6,6 +6,8 @@ services:
       - /etc/ssl:/etc/ssl
     ports:
       - "3000:80" # Map container port to host port for UI
+    networks:
+      - wishr-network
     depends_on:
       - api # Wait for api to be up
     restart: unless-stopped
@@ -16,6 +18,8 @@ services:
       - ./storage:/storage
     ports:
       - "3001:3001" # Map container port to host port for API
+    networks:
+      - wishr-network
     environment:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
@@ -24,15 +28,36 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
     depends_on:
-      - postgres # Wait for db to be up
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
   postgres:
     build:
       context: ./wishr-db
     ports:
       - "3002:5432" # Map container port to host port
+    networks:
+      - wishr-network
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data      # Persistent database data
+      - ./storage:/backups  
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:
+    driver: local
+
+networks:
+  wishr-network:
+    ipam:
+      config:
+        - subnet: "172.22.0.0/16"

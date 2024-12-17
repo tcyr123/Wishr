@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from "../../assets/wishrlogo.png";
-import { API, containsEmptyString, emailPattern, preventDefault } from '../../constants';
+import { API, containsEmptyString, emailPattern, onEnterPressed, preventDefault } from '../../constants';
 import { useUser } from '../../contexts/UseUser';
 
 function Register() {
@@ -68,6 +68,7 @@ function Register() {
                             type="email"
                             id="newEmail"
                             value={email}
+                            onKeyDown={(e) => onEnterPressed(e, handleRegister)}
                             onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
@@ -77,6 +78,7 @@ function Register() {
                             type="text"
                             id="newUsername"
                             value={username}
+                            onKeyDown={(e) => onEnterPressed(e, handleRegister)}
                             onChange={(e) => setUsername(e.target.value)}
                         />
                     </div>
@@ -86,6 +88,7 @@ function Register() {
                             type="password"
                             id="newPassword"
                             value={password}
+                            onKeyDown={(e) => onEnterPressed(e, handleRegister)}
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
@@ -95,6 +98,7 @@ function Register() {
                             type="password"
                             id="newPasswordConf"
                             value={passwordConfirm}
+                            onKeyDown={(e) => onEnterPressed(e, handleRegister)}
                             onChange={(e) => setPasswordConfirm(e.target.value)}
                         />
                     </div>

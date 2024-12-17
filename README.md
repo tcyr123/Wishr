@@ -28,11 +28,12 @@ The repo contains multiple folders in a monorepo structure which can be explaine
 The monorepo contains the separate components, each dockerized to run as individual services. While these services cannot run on their own and therefore would not be considered microservices, they do make for easy scalablility. This means we can deploy multiple copies of one service such as the API through something like Kubernetes and balance out the user load to each container as needed as the user base grows. Simultaneously, this means that if multiple users share an API and one user crashes it, the users will simply be routed to other running coppies of this service as the broken one repairs itself.
 
 ## Showcased Features 🏆
- - Salted/Hashed Password Storage
- - Session Tokens / Session Cookies
- - Token Refresh
- - Session Middleware (for API request authentication)
  - State Persistence (even after user refresh)
+ - Salted/Hashed Password Storage
+ - Refreshing Session Tokens / Session Cookies
+ - Session Middleware (for API request authentication)
+ - Speedy discussion tab via websockets
+ - Cron job to backup and restore DB
 
 ## Languages/Technologies
 | Tool | Extra Details |
