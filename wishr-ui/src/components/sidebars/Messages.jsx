@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { BiSend } from "react-icons/bi";
+import { BiChevronDown, BiChevronUp, BiSend } from "react-icons/bi";
 import NoProfile from "../../assets/NoProfile.png";
 import { API, formatDateNumbers, isStringEmpty, onEnterPressed, websocketDataToJSON } from "../../constants";
 import { useUser } from '../../contexts/UseUser';
@@ -7,12 +7,17 @@ import { useUser } from '../../contexts/UseUser';
 function Messages({ listId }) {
     const [newMsg, setNewMsg] = useState('');
     const [messages, setMessages] = useState([])
+    const [isOpen, setIsOpen] = useState(false)
     const { user } = useUser();
     const ws = useRef(null);
 
     const handleInputChange = (event) => {
         setNewMsg(event.target.value);
     };
+
+    const toggleIsOpen = () => {
+        setIsOpen(!isOpen)
+    }
 
     useEffect(() => {
         let apiToWs = API.replace('https', 'wss')
@@ -70,7 +75,7 @@ function Messages({ listId }) {
         if (!messageList || messageList.length <= 0) { return <p>Empty</p> }
         const innerHtml = (
             messageList.map((message, i) => {
-                let avatar = `${API}/image?photo=${message.user_info?.photo}`
+                let avatar = `${API}/image?photo=${message.user_info?.photo}&email=${message.user_info.email}`
                 return (
                     <div className='message' key={`${message.id}-${i}`}>
                         <div className="profile-container">
@@ -91,23 +96,28 @@ function Messages({ listId }) {
         return <div className="messages-container">{innerHtml}</div>
     }
 
+    let messageClass = isOpen ? "messages" : "messages closed-tab"
+    let messageContentClass = isOpen ? "" : "closed-tab-content"
 
-    return <div className="messages">
-        <h2>Discussion</h2>
-        <hr />
-        <div className="messages-lower-section">
-            {buildMessages(messages)}
+    return <div className={messageClass}>
+        <div onClick={toggleIsOpen} className="selectable">
+            <div>{isOpen ? <BiChevronDown /> : <BiChevronUp />}</div>
+            <h2>Discussion</h2>
         </div>
-        <div className="messages-input-container">
-            <div className="input-with-button">
-                <input
-                    type="text"
-                    placeholder="Add to the discussion"
-                    value={newMsg}
-                    onKeyDown={(e) => onEnterPressed(e, sendMessageWS)}
-                    onChange={handleInputChange}
-                />
-                <button onClick={sendMessageWS}><BiSend /></button>
+        <hr />
+        <div className={`messages-lower-section ${messageContentClass}`}>
+            {buildMessages(messages)}
+            <div className="messages-input-container">
+                <div className="input-with-button">
+                    <input
+                        type="text"
+                        placeholder="Add to the discussion"
+                        value={newMsg}
+                        onKeyDown={(e) => onEnterPressed(e, sendMessageWS)}
+                        onChange={handleInputChange}
+                    />
+                    <button onClick={sendMessageWS}><BiSend /></button>
+                </div>
             </div>
         </div>
     </div>

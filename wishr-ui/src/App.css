@@ -1,16 +1,16 @@
 #root {
   /* max-width: 1280px; */
+  overflow: auto;
   margin: 0 auto;
   text-align: center;
-}
-
-a {
-  cursor: pointer;
-  color: #4080c6;
+  min-height: 100vh;
+  /* fallback to blur 1 if half px doesnt work */
+  backdrop-filter: blur(1px) hue-rotate(45deg);
+  backdrop-filter: blur(1.5px) hue-rotate(45deg);
 }
 
 a:hover {
-  color: #0056b3;
+  color: var(--color-blue);
 }
 
 .react-icons,
@@ -23,26 +23,34 @@ svg {
 
 .main {
   max-width: 100%;
-  padding: 2rem;
+  padding: var(--padding-top-main) 0 0 0;
   overflow: hidden;
 }
 
 .card {
-  background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  padding: 20px;
+  background-color: var(--color-frost);
+  padding: 10px;
   text-align: center;
+  margin: 10px;
+  min-height: 50px;
+  overflow: auto;
 }
 
 .trash:hover,
 .hidden-btn:hover .trash {
-  color: red;
+  color: var(--color-red);
 }
 
 .edit:hover,
 .hidden-btn:hover .edit {
-  color: rgb(0, 145, 255);
+  color: var(--color-yellow);
+}
+
+.view:hover,
+.hidden-btn:hover .view {
+  color: var(--color-blue);
 }
 
 .swipe-action-inner {
@@ -61,17 +69,21 @@ svg {
 .lists {
   display: flex;
   flex-direction: column;
-  width: 35%;
-  max-width: 500px;
+  width: 60%;
+  max-width: 750px;
+  flex: 1;
+  overflow: auto;
 }
 
 .lists-all-container {
   display: flex;
-  flex-direction: row;
-  justify-content: center;
+  flex-direction: column;
   gap: 10%;
-  padding: 5% 0 10% 0px;
+  padding: 5% 0 0 0px;
   align-items: center;
+  box-sizing: border-box;
+  height: 85vh;
+  overflow: hidden;
 }
 
 .list-single-container {
@@ -87,10 +99,11 @@ svg {
   display: flex;
   width: 100%;
   justify-content: space-around;
-  background-color: #e2e2e2;
+  background: var(--color-white);
   padding: 4px;
   gap: 2px;
   box-sizing: border-box;
+  border-radius: 5px;
   cursor: pointer;
   position: relative;
 }
@@ -101,7 +114,7 @@ svg {
 
 .list-title small {
   flex: 1;
-  color: #8e8e8e;
+  color: var(--color-gray);
 }
 
 .list-title p {
@@ -117,7 +130,6 @@ svg {
   width: 35%;
   max-width: 500px;
   margin: 0 auto;
-  background: #e2e2e2;
 }
 
 .relative-overlay {
@@ -126,21 +138,19 @@ svg {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  /* Gray overlay with opacity */
+  background-color: var(--color-half-opacity);
   display: none;
   justify-content: center;
   align-items: center;
 }
 
 .list-title:hover .relative-overlay {
-  display: flex;
   /* Show the overlay on hover */
+  display: flex;
 }
 
 .hidden-btn {
   background-color: #fff;
-  color: #333;
   border: 1px solid #ccc;
   padding: 5px 10px;
   margin: 5px;
@@ -149,12 +159,13 @@ svg {
 
 .hidden-btn:hover {
   background-color: #333;
-  color: #fff;
+  color: var(--color-white);
 }
 
 .btn-box {
   display: flex;
   gap: 10px;
+  justify-content: center;
 }
 
 .btn-box button {
@@ -167,8 +178,8 @@ svg {
 
 .inverse-btn {
   background-color: white;
-  border: solid 1px #4080c6;
-  color: #4080c6;
+  border: solid 1px var(--color-blue);
+  color: var(--color-blue);
 }
 
 .selectable {
@@ -195,32 +206,10 @@ svg {
   margin: 0 auto;
 }
 
-/* When tablet size or smaller */
-@media (max-width: 1023px) {
-  .main {
-    padding: 1rem;
-  }
-
-  .lists-all-container {
-    flex-direction: column;
-  }
-
-  .lists {
-    width: unset;
-    padding: 0 5px;
-  }
-}
-
 /* When phone size or smaller */
 @media (max-width: 767px) {
   h1 {
     font-size: 1.5rem;
-  }
-
-  .main {
-    padding: 0;
-    /* keeps the bottom nav from conflicting with content */
-    padding-bottom: 50px;
   }
 
   .react-icons,

@@ -128,7 +128,7 @@ function App() {
               <div className="relative-overlay">
                 {!isMyList || <div className="hidden-btn" onClick={(e) => { e.stopPropagation(); handleListDelete(listInfo) }}><BiTrashAlt className="trash" /></div>}
                 {!isMyList || <div className="hidden-btn" onClick={(e) => { e.stopPropagation(); prepareEdit(listInfo) }}><BiEditAlt className='edit' /></div>}
-                <div className="hidden-btn"><BiShow /></div>
+                <div className="hidden-btn"><BiShow className="view" /></div>
               </div>
             }
 
@@ -147,7 +147,7 @@ function App() {
     const leadingActions = (listInfo) => (
       <LeadingActions>
         <SwipeAction onClick={() => { prepareEdit(listInfo) }}>
-          <div className="swipe-action-inner" style={{ backgroundColor: "orange" }}><BiEditAlt />
+          <div className="swipe-action-inner" style={{ backgroundColor: "var(--color-yellow)" }}><BiEditAlt />
           </div>
         </SwipeAction>
       </LeadingActions>
@@ -158,7 +158,7 @@ function App() {
         <SwipeAction
           onClick={() => { handleListDelete(listInfo) }}
         >
-          <div className="swipe-action-inner" style={{ backgroundColor: "red" }}><BiTrashAlt />
+          <div className="swipe-action-inner" style={{ backgroundColor: "var(--color-red)" }}><BiTrashAlt />
           </div>
         </SwipeAction>
       </TrailingActions>
@@ -245,15 +245,15 @@ function App() {
         <div className="lists-all-container">
           <div className="lists" >
             <h2>My Lists</h2>
-            <div className={!isMobileView() ? "card" : ""}>
-              <button style={{ marginBottom: "10px" }} onClick={() => { setAction("add") }}>Add List +</button>
+            <button style={{ marginBottom: "10px" }} onClick={() => { setAction("add") }}>Add List +</button>
+            <div className={"card"}>
               {buildForm()}
               {isMobileView() ? buildSwipeLists(true) : buildLists(true)}
             </div >
           </div>
           <div className="lists">
             <h2>Shared Lists</h2>
-            <div className={screenSize !== "mobile" ? "card" : ""}>
+            <div className={"card"}>
               {buildLists(false)}
             </div>
           </div>

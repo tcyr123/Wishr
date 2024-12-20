@@ -1,12 +1,3 @@
-NAV TODOS:
-• Address Inconsistent Pointer UI
-• Add Notification Functionality (large task)
-
-GENERAL TODOS:
-• Extract UI onCLicks into handlers
-• UI Makeover - dark/modern themed, less hard borders, background, animation, new logo, etc
-
-========================================================================================
 
 v0.8.0 is out
 
@@ -18,6 +9,27 @@ Working towards the MVP being v1.0.0, so in between now and then the breakdown w
 ✅ v0.9.4 = marking assigned task as purchased (and unmarking in the case of accidental mark)
 ✅ v0.9.5 = add messages to discussion + reloading discussion on a timer(mvp) or a socket(preferred)
 ✅ v0.9.6 = backup db and images through volumes to host machine & boot up DB from backup if existent
-⚪ v0.9.7+ = minor UI/UX makeovers, code cleanup, better logging, etc
+✅ v0.9.7+ = minor UI/UX makeovers, code cleanup, better logging, etc
 
 ⚪ v1.0.0 [MVP/Beta] = useable by family/friends in a prod environment
+
+========================================================================================
+
+Post v1.0.0 TODOS:
+- Login screen -> forgot password (emails user)
+- Login screen show/hide password
+- Light/dark mode toggle
+- Notifications
+- Email notifications toggle
+- Announcements popup on login (checks if user has already seen announcement)
+- Unit tests (especially for cascade deletions)
+- Add a friends list + dont show all users for viewer options
+- An audit history of what was added/deleted/marked assigned or purchased
+- handle concurrent issues such 
+- online status?
+- should viewers be able to see all other viewers?
+
+NAV TODOS:
+• Address Inconsistent Pointer UI
+• Add Notification Functionality (large task)
+

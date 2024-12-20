@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../assets/wishrlogo.png";
+import logo from "../../assets/logo_svg_crop2.svg";
 import { API, onEnterPressed, preventDefault } from "../../constants";
 import { useUser } from "../../contexts/UseUser";
 import "./Login.css";
@@ -40,8 +40,7 @@ function Login() {
     return (
         <div className="login">
             <img src={logo} alt="logo" className="logo" />
-            <div className="card login-box">
-                <h2>Login</h2>
+            <div style={{ width: "70%", maxWidth: "350px" }}>
                 <form onSubmit={preventDefault}>
                     <div className="input-box">
                         <label htmlFor="email">Email:</label>

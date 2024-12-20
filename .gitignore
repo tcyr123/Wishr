@@ -1,2 +1,2 @@
 # Retaining the three base images, but not pushing new images (from new users) to git
-# storage
+storage

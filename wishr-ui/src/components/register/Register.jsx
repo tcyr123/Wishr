@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from "../../assets/wishrlogo.png";
+import logo from "../../assets/logo_svg_crop2.svg";
 import { API, containsEmptyString, emailPattern, onEnterPressed, preventDefault } from '../../constants';
 import { useUser } from '../../contexts/UseUser';
 
@@ -27,7 +27,6 @@ function Register() {
         }
 
         if (password.length < 8 || !/[!@#$%^&*]/.test(password) || !/\d/.test(password)) {
-            console.log(password, [password.length < 8, !/[!@#$%^&*]/.test(password), !/\d/.test(password)]);
             setError("Password must be at least 8 characters long and include a number and a special character");
             return;
         }
@@ -59,8 +58,7 @@ function Register() {
     return (
         <div className="login">
             <img src={logo} alt="logo" className="logo" />
-            <div className="card login-box">
-                <h2>Register</h2>
+            <div>
                 <form onSubmit={preventDefault}>
                     <div className='input-box'>
                         <label htmlFor="newEmail">Email:</label>

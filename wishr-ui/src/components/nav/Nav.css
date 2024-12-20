@@ -1,13 +1,8 @@
-/* h1 {
-    color: red;
-} 
-^ This will bleed over into all areas, even when component is not in use.
-*/
-
 .nav {
-    background: #e2e2e2;
+    background: var(--color-frost);
     width: 100%;
-    padding: 5px 0px;
+    height: var(--height-nav);
+    padding: 0px;
     display: flex;
     justify-content: center;
 }
@@ -16,11 +11,11 @@
     align-self: center;
     text-align: left;
     flex: 2;
-    /* filter: drop-shadow(2px 4px 4px gray); */
+    margin-left: 40px;
 }
 
 .nav-logo img {
-    width: 175px;
+    width: 150px;
 }
 
 .nav-btn-container {
@@ -71,6 +66,9 @@
 .notification-icon {
     position: relative;
     display: inline-block;
+
+    /* todo: remove display none once notifications are implemented */
+    display: none;
 }
 
 .notification-badge {

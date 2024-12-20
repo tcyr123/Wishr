@@ -18,22 +18,47 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  --background-start: 20%;
+  --background-end: 80%;
+
+  --color-white: whitesmoke;
+  --color-yellow: #AF9B46;
+  --color-red: #AF125A;
+  --color-blue: #1098F7;
+  --color-green: #6B8F71;
+  --color-gray: #8e8e8e;
+  --color-frost: hsl(0deg 0% 100% / 25%);
+  --color-half-opacity: rgb(0 0 0 / 20%);
+
+  --padding-top-main: 2rem;
+  --height-nav: max(5vh, 65px);
+
+  --vh-minus-nav: calc(100vh - var(--height-nav));
+  --vh-minus-nav-pad: calc(var(--vh-minus-nav) - var(--padding-top-main));
 }
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--color-blue);
   text-decoration: inherit;
+  cursor: pointer;
 }
 
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
+  min-height: var(--vh-minus-nav);
 }
 
 h1 {
   margin: 0;
+  text-shadow: 0px 0px black;
+}
+
+h2 {
+  text-shadow: 1px 1px var(--color-white);
+  ;
 }
 
 
@@ -46,15 +71,17 @@ button,
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #4080c6;
+  background-color: var(--color-blue);
   cursor: pointer;
   transition: border-color 0.25s;
+  max-width: 165px;
+  align-self: center;
 }
 
 button:hover,
 a:hover {
-  border-color: #0056b3;
-  filter: saturate(1.5)
+  border-color: var(--color-blue);
+  filter: saturate(1.5) drop-shadow(1px 1px 2px var(--color-white))
 }
 
 button:focus,
@@ -65,5 +92,70 @@ button:focus-visible {
 .input-box {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: start;
+}
+
+.pink-gradient {
+  background: linear-gradient(270deg, hsl(304.53deg 100% 96.4%) 0%, hsl(304.1deg 100% 89.66%) 100%), url(/src/assets/texture-china.webp), linear-gradient(to left, #e7a7cb var(--background-start), #ffe4f3 var(--background-start), #ffe4f3 var(--background-end), #e7a7cb var(--background-end));
+
+  background: -moz-linear-gradient(270deg, hsl(304.53deg 100% 96.4%) 0%, hsl(304.1deg 100% 89.66%) 100%), url(/src/assets/texture-china.webp), linear-gradient(to left, #e7a7cb var(--background-start), #ffe4f3 var(--background-start), #ffe4f3 var(--background-end), #e7a7cb var(--background-end));
+
+
+  background: -webkit-linear-gradient(270deg, hsl(304.53deg 100% 96.4%) 0%, hsl(304.1deg 100% 89.66%) 100%), url(/src/assets/texture-china.webp), linear-gradient(to left, #e7a7cb var(--background-start), #ffe4f3 var(--background-start), #ffe4f3 var(--background-end), #e7a7cb var(--background-end));
+
+  filter: progid: DXImageTransform.Microsoft.gradient(startColorstr="#F9CDC3", endColorstr="#FACEFB", GradientType=1);
+
+  background-blend-mode: difference;
+}
+
+/* Scrollbar Section */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.5) transparent;
+}
+
+*::-scrollbar-thumb:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.7) transparent;
+}
+
+/* When phone size or smaller */
+@media (max-width: 767px) {
+  :root {
+    --background-start: 0%;
+    --background-end: 100%;
+    --padding-top-main: 0px;
+    --height-nav: 40px;
+  }
+
+  .lists {
+    width: 100%;
+  }
+
+  .lists-all-container {
+    gap: 10px;
+  }
 }

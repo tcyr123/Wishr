@@ -1,13 +1,6 @@
 export const API = import.meta.env?.VITE_API_URL || "unknown_api"
 export const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// export const axiosInstance = axios.create({
-//     withCredentials: true,
-//     baseURL: 'http://localhost:3001',
-// });
-
-// export default axiosInstance;
-
 //puts date in format: Mar 23, 2023, 08:22 AM
 export function formatDateWords(originalDate) {
     if (!originalDate) {

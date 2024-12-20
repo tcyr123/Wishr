@@ -1,26 +1,21 @@
 .login {
+    height: 85vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 10vh;
+    justify-content: center;
     gap: 25px;
 }
 
 .login .logo {
-    width: 400px;
-    max-width: 80%;
-    filter: drop-shadow(2px 4px 4px gray);
-}
-
-.login-box {
-    width: 400px;
+    width: 450px;
     max-width: 80%;
 }
 
 .login form {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
 }
 
 .login input {
@@ -29,8 +24,15 @@
     margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    box-sizing: border-box;
 }
 
 .error {
     color: red;
+}
+
+.gift {
+    max-width: 60%;
+    width: 450px;
+    margin-top: 50px;
 }

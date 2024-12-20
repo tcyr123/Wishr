@@ -5,6 +5,8 @@ import "react-confirm-alert/src/react-confirm-alert.css";
 import { BiChevronLeft, BiEditAlt, BiLink, BiTrashAlt } from "react-icons/bi";
 import { IoBagCheckOutline } from "react-icons/io5";
 import { useLocation, useNavigate } from "react-router-dom";
+import { LeadingActions, Type as ListType, SwipeableList, SwipeableListItem, SwipeAction, TrailingActions } from "react-swipeable-list";
+import 'react-swipeable-list/dist/styles.css';
 import NoProfile from "../../assets/NoProfile.png";
 import { API, handleFieldChange, isCompletelyEmpty, isStringEmpty, onEnterPressed } from '../../constants';
 import { useAlert } from "../../contexts/Alert";
@@ -30,6 +32,7 @@ function Items() {
     const [alertInfo, setAlertInfo] = useState(null);
     const isMyList = location.state.listInfo?.isMyList
     const listId = location.state.listInfo?.list_id
+    const isSwipeable = isMobileView() && isMyList
 
     useEffect(() => {
         if (!location || !location.state) {
@@ -170,35 +173,99 @@ function Items() {
             return <p key={"empty items"}>Empty</p>
         }
 
+        const leadingActions = (listedItem) => (
+            <LeadingActions>
+                <SwipeAction onClick={() => handleEditSection(listedItem)}>
+                    <div className="swipe-action-inner" style={{ backgroundColor: "var(--color-yellow)" }}><BiEditAlt />
+                    </div>
+                </SwipeAction>
+            </LeadingActions>
+        );
+
+        const trailingActions = (listedItem) => (
+            <TrailingActions>
+                <SwipeAction
+                    onClick={() => handleItemDelete(listedItem)}
+                >
+                    <div className="swipe-action-inner" style={{ backgroundColor: "var(--color-red)" }}><BiTrashAlt />
+                    </div>
+                </SwipeAction>
+            </TrailingActions>
+        );
+
         return (
             itemsList.map(listedItem => {
                 let avatar_photo_name = listedItem.assigned_user?.photo;
-                let avatar = avatar_photo_name ? `${API}/image?photo=${avatar_photo_name}` : null;
-                return (
+                let avatar = avatar_photo_name ? `${API}/image?photo=${avatar_photo_name}&email=${listedItem.assigned_user?.email}` : null;
+
+                const itemHTML = (
                     <div className='item' key={listedItem.id}>
-                        {isMyList ? <div className="item-left">
-                            <div onClick={() => handleItemDelete(listedItem)} style={{ marginRight: "20px" }}><BiTrashAlt className="trash" /></div>
-                            <div onClick={() => handleEditSection(listedItem)}><BiEditAlt className='edit' /></div>
-                        </div> :
-                            <div className="item-left noselect" onClick={() => handleEditSection(listedItem)}>
-                                <div className="flex-1">
-                                    <div className="profile-container selectable">
-                                        <img src={avatar || NoProfile} alt={`${listedItem.assigned_user?.email}-profile-photo`} />
-                                    </div>
-                                    <small>{listedItem.assigned_user?.username}</small>
-                                </div>
-                                <div className="check flex-1">{listedItem.is_purchased ? <IoBagCheckOutline color='green' /> : null}</div>
-                            </div>}
-                        <div className={!isMyList && listedItem.is_purchased ? "item-center strikethrough" : "item-center"}>
-                            <p>{listedItem.item_name}</p>
-                            <small>{listedItem.item_description}</small>
-                        </div>
-                        <div className="item-right">
-                            <a target="_blank" href={listedItem.link} rel="noreferrer">{listedItem.link ? <BiLink color='#4080c6' /> : null}</a>
-                        </div>
+                        {isSwipeable ?
+                            buildSwipeItemContent(listedItem)
+                            :
+                            buildItemContent(listedItem, avatar)
+                        }
                     </div>
                 )
+
+                if (isSwipeable) {
+                    return (
+                        <SwipeableListItem
+                            className='more-bottom noselect'
+                            key={`swipe-${listedItem.id}`}
+                            leadingActions={leadingActions(listedItem)}
+                            trailingActions={trailingActions(listedItem)}
+                        >{itemHTML}
+                        </SwipeableListItem>
+                    )
+                }
+
+                return itemHTML;
             })
+        )
+    }
+
+    function buildItemContent(listedItem, avatar) {
+        return (<>
+            {isMyList ?
+                <div className="item-left">
+                    <div onClick={() => handleItemDelete(listedItem)}><BiTrashAlt className="trash" /></div>
+                    <div onClick={() => handleEditSection(listedItem)}><BiEditAlt className='edit' /></div>
+                </div> :
+                <div className="item-left noselect" onClick={() => handleEditSection(listedItem)}>
+                    <div className="flex-1">
+                        <div className="profile-container selectable">
+                            <img src={avatar || NoProfile} alt={`${listedItem.assigned_user?.email}-profile-photo`} />
+                        </div>
+                        <small>{listedItem.assigned_user?.username}</small>
+                    </div>
+                    <div className="check flex-1">{listedItem.is_purchased ? <IoBagCheckOutline color='var(--color-green)' /> : null}</div>
+                </div>
+            }
+
+            <div className={!isMyList && listedItem.is_purchased ? "item-center strikethrough" : "item-center"}>
+                <p>{listedItem.item_name}</p>
+                <small>{listedItem.item_description}</small>
+            </div>
+            <div className="item-right">
+                <a target="_blank" href={listedItem.link} rel="noreferrer">{listedItem.link ? <BiLink color='var(--color-blue)' /> : null}</a>
+            </div>
+        </>
+        )
+    }
+
+    function buildSwipeItemContent(listedItem) {
+        return (<>
+            <div className="item-left">
+                <small>{listedItem.item_description}</small>
+            </div>
+            <div className="item-center">
+                <p>{listedItem.item_name}</p>
+            </div>
+            <div className="item-right">
+                <a target="_blank" href={listedItem.link} rel="noreferrer">{listedItem.link ? <BiLink color='var(--color-blue)' /> : null}</a>
+            </div>
+        </>
         )
     }
 
@@ -338,22 +405,32 @@ function Items() {
         />
     }
 
+    function isMobileView() {
+        return screenSize === "mobile"
+    }
+
     return (
         <ScreenSizeContext.Provider value={screenSize}>
             <div className='main'>
                 <div className="items-page">
-                    <div className="items-section">
+                    <div className="lists" style={{ alignSelf: "center" }}>
                         <div className="item-list-title">
-                            <h1><a onClick={() => { navigate(-1) }}><BiChevronLeft /></a>{location.state.listInfo?.title}</h1>
+                            <h1><a onClick={() => { navigate(-1) }} className="back-arrow"><BiChevronLeft /></a>{location.state.listInfo?.title}</h1>
                         </div>
-                        <div className="items-container">
+                        <div className="items-container card">
                             {isMyList &&
                                 <div>
                                     <button style={{ marginTop: "10px" }} onClick={() => { setAction("add") }}>Add Item +</button>
                                 </div>}
-                            {buildItems(items)}
+                            {isSwipeable ?
+                                <SwipeableList fullSwipe={true}
+                                    type={ListType.IOS} threshold={0.5}>
+                                    {buildItems(items)}
+                                </SwipeableList>
+                                :
+                                buildItems(items)
+                            }
                         </div>
-                        <br />
                         {isMyList ? buildItemForm() : buildAssignmentForm()}
                     </div>
                     {isMyList ? <Viewers listId={listId} /> : <Messages listId={listId} />}

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BiBell, BiHomeAlt } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 import NoProfile from "../../assets/NoProfile.png";
-import logo from "../../assets/wishrlogo.png";
+import logo from "../../assets/logo_svg_crop2.svg";
 import { API } from "../../constants";
 import { useUser } from '../../contexts/UseUser';
 import "./Nav.css";
@@ -90,6 +90,8 @@ function Nav({ children }) {
         setShowNavBox(current => current === 2 ? 0 : 2)
     }
 
+    const goHomeHandler = () => { navigate("/") }
+
     function uploadAvatar(file) {
         const formData = new FormData();
         formData.append('photo', file);
@@ -129,8 +131,8 @@ function Nav({ children }) {
         const lowPad = { padding: "4px" }
         const inverseBtn = {
             backgroundColor: 'white',
-            border: 'solid 1px #4080c6',
-            color: '#4080c6',
+            border: 'solid 1px var(--color-blue)',
+            color: 'var(--color-blue)',
             flex: "1",
         }
 
@@ -160,9 +162,9 @@ function Nav({ children }) {
 
     return (<>
         <div className="nav" key={"nav"}>
-            <div className="nav-logo" onClick={() => { navigate("/") }}><img src={logo} alt='logo' /></div>
+            <div className="nav-logo" onClick={goHomeHandler}><img src={logo} alt='logo' /></div>
             <div className="nav-btn-container">
-                <BiHomeAlt onClick={() => { navigate("/") }} color='black' />
+                <BiHomeAlt onClick={goHomeHandler} color='black' />
                 <div className="nav-divider"></div>
                 <div className="notification-icon" onClick={toggleNotifications}>
                     <BiBell color='black' />

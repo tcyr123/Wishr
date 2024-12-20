@@ -114,7 +114,12 @@ func SaveUserImage(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 func GetImageFromStorage(w http.ResponseWriter, r *http.Request) {
 	photoFilename := r.URL.Query().Get("photo")
-	storagePath := fmt.Sprintf("/storage/%s", cookie_email)
+	userEmail := r.URL.Query().Get("email")
+	if userEmail == "" {
+		userEmail = cookie_email
+	}
+
+	storagePath := fmt.Sprintf("/storage/%s", userEmail)
 	imagePath := fmt.Sprintf("%s/%s", storagePath, photoFilename)
 	if _, err := os.Stat(imagePath); os.IsNotExist(err) {
 		files, dirErr := os.ReadDir(storagePath)
@@ -122,7 +127,7 @@ func GetImageFromStorage(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Couldnt even list the files in %v. Error: %v", storagePath, dirErr)
 		}
 
-		log.Printf("File could not be found: %v . Files are %v", photoFilename, files)
+		log.Printf("File could not be found: %v . Files are %v", imagePath, files)
 		http.Error(w, "File not found in Wishr", http.StatusNotFound)
 		return
 	}

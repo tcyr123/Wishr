@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import { BiSolidUserPlus, BiTrashAlt } from "react-icons/bi";
+import { BiChevronDown, BiChevronUp, BiSolidUserPlus, BiTrashAlt } from "react-icons/bi";
 import NoProfile from "../../assets/NoProfile.png";
 import { API } from "../../constants";
 import { useUser } from "../../contexts/UseUser";
@@ -15,15 +15,25 @@ function Viewers({ listId }) {
     const [viewerState, setViewerState] = useState('view')
     const [totalUsers, setTotalUsers] = useState()
     const [sharedUsers, setSharedUsers] = useState([])
+    const [isOpen, setIsOpen] = useState(false)
     const { user } = useUser();
 
     useEffect(() => {
         getViewers(listId)
-        populateTotalUsers()
     }, [])
+
+    useEffect(() => {
+        if (user != null) {
+            populateTotalUsers()
+        }
+    }, [user])
 
     const handleViewerChange = (event) => {
         setNewViewer(event.target?.value)
+    }
+
+    const toggleIsOpen = () => {
+        setIsOpen(!isOpen)
     }
 
     const handleViewerDelete = (viewer) => {
@@ -98,7 +108,7 @@ function Viewers({ listId }) {
         })
             .then(response => {
                 //remove self from share list
-                const filteredUsers = response.data?.filter(email => email !== user.email);
+                const filteredUsers = response.data?.filter(email => email !== user?.email);
                 setTotalUsers(filteredUsers)
             })
             .catch(error => {
@@ -107,38 +117,36 @@ function Viewers({ listId }) {
     }
 
     function buildViewerForm() {
-        if (viewerState === "view") {
-            return <button onClick={() => { setViewerState("add") }} className='viewer-add'><BiSolidUserPlus /> Add Viewer</button>
-        } else if (viewerState === "add") {
-            const cancelCallback = () => { setViewerState("view") }
-            return <TextInputsModal
-                headline="Share List"
-                inputSections={[
-                    {
-                        labelValue: 'Viewer Email',
-                        inputType: 'text',
-                        textList: totalUsers,
-                        id: 'viewerName',
-                        value: newViewer,
-                        placeholder: 'john@gmail.com',
-                        onChange: (e) => handleViewerChange(e),
-                    }
-                ]}
-                buttons={[
-                    {
-                        title: 'Cancel',
-                        className: 'inverse-btn',
-                        callbackFunction: cancelCallback,
-                    },
-                    {
-                        title: 'Save',
-                        className: '',
-                        callbackFunction: () => { addViewer(); setViewerState("view") },
-                    },
-                ]}
-                onOverlayClick={cancelCallback}
-            />
-        }
+        if (viewerState != "add") { return }
+
+        const cancelCallback = () => { setViewerState("view") }
+        return <TextInputsModal
+            headline="Share List"
+            inputSections={[
+                {
+                    labelValue: 'Viewer Email',
+                    inputType: 'text',
+                    textList: totalUsers,
+                    id: 'viewerName',
+                    value: newViewer,
+                    placeholder: 'john@gmail.com',
+                    onChange: (e) => handleViewerChange(e),
+                }
+            ]}
+            buttons={[
+                {
+                    title: 'Cancel',
+                    className: 'inverse-btn',
+                    callbackFunction: cancelCallback,
+                },
+                {
+                    title: 'Save',
+                    className: '',
+                    callbackFunction: () => { addViewer(); setViewerState("view") },
+                },
+            ]}
+            onOverlayClick={cancelCallback}
+        />
     }
 
     function buildSharedUsers() {
@@ -147,18 +155,20 @@ function Viewers({ listId }) {
         }
 
         return sharedUsers.map(({ shared_user }) => {
-            let avatar = `${API}/image?photo=${shared_user.photo}`
+            let avatar = `${API}/image?photo=${shared_user.photo}&email=${shared_user.email}`
             return (
                 <div className='message viewer' key={shared_user.email}>
-                    <div className="profile-container">
-                        <img src={avatar || NoProfile} alt={`${shared_user.email}-profile-photo`} />
+                    <div style={{ flex: 1 }}>
+                        <div className="profile-container">
+                            <img src={avatar || NoProfile} alt={`${shared_user.email}-profile-photo`} />
+                        </div>
                     </div>
                     <div className="message-info">
                         <small>{shared_user.username}</small>
                         <div className="message-metadata"></div>
                         <small>{shared_user.email}</small>
                     </div>
-                    <div onClick={() => handleViewerDelete(shared_user)}>
+                    <div style={{ flex: 1 }} onClick={() => handleViewerDelete(shared_user)}>
                         <BiTrashAlt className="trash" />
                     </div>
                 </div>
@@ -166,10 +176,17 @@ function Viewers({ listId }) {
         })
     }
 
-    return <div className="messages">
-        <h2>Viewers</h2>
+    let messageClass = isOpen ? "messages" : "messages closed-tab"
+    let messageContentClass = isOpen ? "" : "closed-tab-content"
+
+    return <div className={messageClass}>
+        <div onClick={toggleIsOpen} className="selectable">
+            <div>{isOpen ? <BiChevronDown /> : <BiChevronUp />}</div>
+            <h2>Viewers</h2>
+        </div>
         <hr />
-        <div className="messages-lower-section">
+        <div className={`messages-lower-section ${messageContentClass}`}>
+            <button onClick={() => { setViewerState("add") }} className='viewer-add'><BiSolidUserPlus /> Add Viewer</button>
             {buildSharedUsers()}
             {buildViewerForm()}
         </div>
