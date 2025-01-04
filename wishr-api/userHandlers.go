@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -30,7 +31,7 @@ func Signin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	// Get the users data (name and photo reference) from db
 	var userInfo UserDTO
-	err = db.QueryRow("SELECT email, username, photo from USERS where email = $1", user.Email).Scan(&userInfo.Email, &userInfo.Username, &userInfo.Photo)
+	err = db.QueryRow("SELECT email, username, photo, COALESCE(security_question_id, -1) from USERS where email = $1", user.Email).Scan(&userInfo.Email, &userInfo.Username, &userInfo.Photo, &userInfo.SecQId)
 	if err != nil {
 		log.Println("Error with query: ", err)
 		http.Error(w, "Error with query", http.StatusInternalServerError)
@@ -52,19 +53,28 @@ func Register(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil || isUserInvalid(user) {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, "Missing parameters", http.StatusBadRequest)
 		return
 	}
 
 	salt, err := generateSalt(12)
-	if err != nil || isUserInvalid(user) {
+	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	qry := "INSERT INTO users (email, username, salt, password) values ($1, $2, $3, $4)"
+	qry := "INSERT INTO users (email, username, salt, password, security_question_id) values ($1, $2, $3, $4, $5)"
 
-	_, err = db.Exec(qry, user.Email, user.Username, salt, hashPassword(user.Password, salt))
+	_, err = db.Exec(qry, user.Email, user.Username, salt, hashPassword(user.Password, salt), user.SecurityQId)
+	if err != nil {
+		log.Println("Error with query: ", err)
+		http.Error(w, "Error with query", http.StatusInternalServerError)
+		return
+	}
+
+	// always lowercase entry and check for answers
+	secQry := "INSERT INTO SECURITY_ANSWERS (user_email, answer) values ($1, lower($2))"
+	_, err = db.Exec(secQry, user.Email, user.SecurityAns)
 	if err != nil {
 		log.Println("Error with query: ", err)
 		http.Error(w, "Error with query", http.StatusInternalServerError)
@@ -83,6 +93,98 @@ func Register(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	createdUser := UserDTO{Email: user.Email, Username: user.Username, Photo: ""}
 	json.NewEncoder(w).Encode(createdUser)
+}
+
+func SecurityQuestions(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var secQs []SecurityQuestion
+	qry := "SELECT id, question FROM SECURITY_QUESTIONS"
+
+	rows, err := db.Query(qry)
+	if err != nil {
+		log.Println("Error with query: ", err)
+		http.Error(w, "Error with query", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var q SecurityQuestion
+		if err := rows.Scan(&q.Id, &q.Question); err != nil {
+			log.Println(err)
+		}
+		secQs = append(secQs, q)
+	}
+
+	json.NewEncoder(w).Encode(secQs)
+}
+
+func GetResetPWPrompt(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	email := r.URL.Query().Get("email")
+	if email == "" {
+		http.Error(w, "Missing parameters", http.StatusBadRequest)
+		return
+	}
+
+	var question SecurityQuestion
+	qry := "SELECT s.id, s.question from security_questions s left outer join users u on s.id=u.security_question_id where u.email = $1"
+	err := db.QueryRow(qry, email).Scan(&question.Id, &question.Question)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "Forbidden: No security question found for this email", http.StatusForbidden)
+			return
+		}
+
+		log.Println("Error with query: ", err)
+		http.Error(w, "Error with query", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(question)
+}
+
+func ResetPassword(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var dto ResetPasswordDTO
+	err := json.NewDecoder(r.Body).Decode(&dto)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if dto.SecurityAnswer.Answer == "" || dto.SecurityAnswer.Email == "" || dto.NewPassword == "" || !isValidPw(dto.NewPassword) {
+		http.Error(w, "Missing parameters", http.StatusBadRequest)
+		return
+	}
+
+	var trueAns string
+	qry := "SELECT lower(answer) question FROM SECURITY_ANSWERS WHERE user_email = $1"
+	err = db.QueryRow(qry, dto.SecurityAnswer.Email).Scan(&trueAns)
+	if err != nil {
+		log.Println("Error with query: ", err)
+		http.Error(w, "Error with query", http.StatusInternalServerError)
+		return
+	}
+
+	if trueAns != strings.ToLower(dto.SecurityAnswer.Answer) {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	//all good past this point. Set new pw
+	salt, err := generateSalt(12)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	updateQry := "UPDATE USERS SET password = $1, salt = $2 WHERE email = $3"
+	_, err = db.Exec(updateQry, hashPassword(dto.NewPassword, salt), salt, dto.SecurityAnswer.Email)
+	if err != nil {
+		log.Println("Error with query: ", err)
+		http.Error(w, "Error with query", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusAccepted)
 }
 
 func Refresh(w http.ResponseWriter, r *http.Request) {

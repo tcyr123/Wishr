@@ -4,6 +4,7 @@ FROM postgres:latest
 RUN apt-get update && apt-get install -y cron
 
 COPY start.sh /start.sh
+RUN chmod +x /start.sh
 COPY init.sql /docker-entrypoint-initdb.d/
 COPY backup-restore.sh /backup-restore.sh
 RUN chmod +x /backup-restore.sh

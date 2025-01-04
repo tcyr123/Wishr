@@ -82,6 +82,23 @@ func EditItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
+	oldAssigned, _, err := getAssignedItemDetails(db, item)
+	if err != nil {
+		http.Error(w, "Failed to fetch item details", http.StatusInternalServerError)
+		return
+	}
+
+	//checking for cookie email to see if user is unassigning themselves
+	if oldAssigned != "" && oldAssigned != item.AssignedUser.Email && oldAssigned != cookie_email {
+		http.Error(w, "Cannot overwrite a user that is already assigned (try refreshing)", http.StatusBadRequest)
+		return
+	}
+
+	if *item.IsPurchased && item.AssignedUser.Email == "" {
+		http.Error(w, "Cannot mark an unassigned item as purchased (try refreshing)", http.StatusBadRequest)
+		return
+	}
+
 	var queryBuffer bytes.Buffer
 	queryBuffer.WriteString("UPDATE Items SET id = id ")
 
@@ -107,16 +124,24 @@ func EditItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		paramIndex++
 	}
 
-	if item.IsPurchased != nil {
-		isAssumedOwner = false
-		queryBuffer.WriteString(fmt.Sprintf(", is_purchased = $%d ", paramIndex))
-		queryParams = append(queryParams, *item.IsPurchased)
-		paramIndex++
-	}
-	if item.AssignedUser.Email != "" {
+	var coveredIsPurchased = false
+	if item.AssignedUser.Email != "" && oldAssigned == "" {
 		isAssumedOwner = false
 		queryBuffer.WriteString(fmt.Sprintf(", assigned_user = $%d ", paramIndex))
 		queryParams = append(queryParams, item.AssignedUser.Email)
+		paramIndex++
+	} else if item.AssignedUser.Email == "" && oldAssigned != "" {
+		isAssumedOwner = false
+		coveredIsPurchased = true
+		queryBuffer.WriteString(fmt.Sprintf(", assigned_user = $%d, is_purchased = false ", paramIndex))
+		queryParams = append(queryParams, nil)
+		paramIndex++
+	}
+
+	if item.IsPurchased != nil && !coveredIsPurchased {
+		isAssumedOwner = false
+		queryBuffer.WriteString(fmt.Sprintf(", is_purchased = $%d ", paramIndex))
+		queryParams = append(queryParams, *item.IsPurchased)
 		paramIndex++
 	}
 
@@ -134,11 +159,25 @@ func EditItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	_, err = db.Exec(queryBuffer.String(), queryParams...)
 	if err != nil {
 		log.Printf("Error executing query: %v", err)
-		http.Error(w, "Failed to update message", http.StatusInternalServerError)
+		http.Error(w, "Failed to update item", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func getAssignedItemDetails(db *sql.DB, item Item) (string, bool, error) {
+	var oldAssigned string
+	var oldIsPurchased bool
+
+	checkQry := "SELECT COALESCE(assigned_user, ''), COALESCE(is_purchased, false) FROM items WHERE id = $1"
+	err := db.QueryRow(checkQry, item.ID).Scan(&oldAssigned, &oldIsPurchased)
+	if err != nil {
+		log.Printf("Error executing query: %v", err)
+		return oldAssigned, oldIsPurchased, err
+	}
+
+	return oldAssigned, oldIsPurchased, nil
 }
 
 func DeleteItemsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {

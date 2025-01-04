@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { API } from "../constants";
 
 const UserContext = createContext();
+const TOKEN_REFRESH_SECONDS = 840000 //14minutes. Expires at 15.
 
 export function UserProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -41,10 +42,9 @@ export function UserProvider({ children }) {
         //Essentially the same as setTimeout but more accurate
         clearInterval(tokenRefreshInterval);
 
-        //In 1min 45sec call for refreshed token. Expires at 2min
         tokenRefreshInterval = setInterval(() => {
             refreshToken();
-        }, 105000);
+        }, TOKEN_REFRESH_SECONDS);
     };
 
     const refreshToken = () => {
@@ -73,7 +73,7 @@ export function UserProvider({ children }) {
         axios.get(`${API}/logout`, {
             withCredentials: true,
         })
-            .then(response => {
+            .then(() => {
 
             })
             .catch(error => {

@@ -12,6 +12,7 @@ import {
 } from 'react-swipeable-list';
 import 'react-swipeable-list/dist/styles.css';
 import './App.css';
+import LogoHeader from './components/header/LogoHeader';
 import TextInputsModal from './components/modals/TextInputsModal';
 import { API, formatDateNumbers, isStringEmpty, onEnterPressed } from './constants';
 import ScreenSizeContext from './contexts/ScreenSizeContext';
@@ -241,18 +242,22 @@ function App() {
   return (
     <ScreenSizeContext.Provider value={screenSize}>
       <div className='main'>
-        <div className="page-title"><h1>Home</h1></div>
+        {isMobileView() && <LogoHeader />}
         <div className="lists-all-container">
-          <div className="lists" >
-            <h2>My Lists</h2>
-            <button style={{ marginBottom: "10px" }} onClick={() => { setAction("add") }}>Add List +</button>
+          <div className="lists">
+            <div className='lists-header'>
+              <h2>My Lists</h2>
+              <button style={{ marginBottom: "10px" }} onClick={() => { setAction("add") }}>Add List +</button>
+            </div>
             <div className={"card"}>
               {buildForm()}
               {isMobileView() ? buildSwipeLists(true) : buildLists(true)}
             </div >
           </div>
           <div className="lists">
-            <h2>Shared Lists</h2>
+            <div className='lists-header'>
+              <h2>Shared Lists</h2>
+            </div>
             <div className={"card"}>
               {buildLists(false)}
             </div>

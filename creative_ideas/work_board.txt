@@ -1,4 +1,3 @@
-
 v0.8.0 is out
 
 Working towards the MVP being v1.0.0, so in between now and then the breakdown will be something like:
@@ -11,23 +10,24 @@ Working towards the MVP being v1.0.0, so in between now and then the breakdown w
 ✅ v0.9.6 = backup db and images through volumes to host machine & boot up DB from backup if existent
 ✅ v0.9.7+ = minor UI/UX makeovers, code cleanup, better logging, etc
 
-⚪ v1.0.0 [MVP/Beta] = useable by family/friends in a prod environment
+✅ v1.0.0 [MVP/Beta] = useable by family/friends in a prod environment
 
 ========================================================================================
+v1.0.0 is out
 
 Post v1.0.0 TODOS:
-- Login screen -> forgot password (emails user)
-- Login screen show/hide password
-- Light/dark mode toggle
-- Notifications
-- Email notifications toggle
-- Announcements popup on login (checks if user has already seen announcement)
-- Unit tests (especially for cascade deletions)
-- Add a friends list + dont show all users for viewer options
-- An audit history of what was added/deleted/marked assigned or purchased
-- handle concurrent issues such 
-- online status?
-- should viewers be able to see all other viewers?
+⚪ Ensure new message dateTimes are saved/displayed correctly based on timezone
+⚪ Login screen -> forgot password (emails user instead of security q)
+⚪ Priority number shown per item
+⚪ Notifications
+⚪ Email notifications toggle
+⚪ Announcements popup on login (checks if user has already seen announcement)
+⚪ Unit tests (especially for cascade deletions)
+⚪ Add a friends list + dont show all users for viewer options
+⚪ An audit history of what was added/deleted/marked assigned or purchased
+⚪ handle concurrent issues such as two users assigning themselves to same item
+⚪ viewers should be able to see other viewers
+⚪ online status?
 
 NAV TODOS:
 • Address Inconsistent Pointer UI

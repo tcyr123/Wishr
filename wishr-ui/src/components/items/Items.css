@@ -30,7 +30,7 @@
 
 .item-list-title {
     max-width: 500px;
-    margin: 0 auto 40px;
+    text-align: left;
 }
 
 .item-left {
@@ -71,6 +71,8 @@
     flex: 1;
     min-height: 200px;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .messages h2 {
@@ -80,7 +82,7 @@
 .messages-container {
     overflow-y: auto;
     padding: 7px;
-    padding-bottom: 60px;
+    flex: 3;
 }
 
 .message {
@@ -111,16 +113,15 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    overflow: auto;
 }
 
 .messages-input-container {
     position: sticky;
     bottom: 0;
     left: 0;
-    display: flex;
-    align-items: center;
     width: 100%;
-    background-color: #e2e2e2;
+    background-color: var(--color-white);
 }
 
 .closed-tab {
@@ -186,10 +187,10 @@
     }
 
     .input-with-button button {
-        padding: 0 1.4rem;
+        padding: 0 0.75rem;
     }
 
-    .input-with-button input {
+    .messages .input-with-button input {
         padding-right: 17%;
     }
 

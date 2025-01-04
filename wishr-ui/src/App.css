@@ -3,7 +3,7 @@
   overflow: auto;
   margin: 0 auto;
   text-align: center;
-  min-height: 100vh;
+  min-height: 100dvh;
   /* fallback to blur 1 if half px doesnt work */
   backdrop-filter: blur(1px) hue-rotate(45deg);
   backdrop-filter: blur(1.5px) hue-rotate(45deg);
@@ -75,6 +75,12 @@ svg {
   overflow: auto;
 }
 
+.lists-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 20px;
+}
+
 .lists-all-container {
   display: flex;
   flex-direction: column;
@@ -82,7 +88,7 @@ svg {
   padding: 5% 0 0 0px;
   align-items: center;
   box-sizing: border-box;
-  height: 85vh;
+  height: var(--vh-minus-nav-pad);
   overflow: hidden;
 }
 
@@ -108,7 +114,8 @@ svg {
   position: relative;
 }
 
-.list-title:last-child {
+.list-title:last-child,
+.swipeable-list-item:last-child {
   margin-bottom: unset;
 }
 
@@ -124,12 +131,6 @@ svg {
 .profile-pic {
   max-width: 100px;
   max-height: 100px;
-}
-
-.page-title {
-  width: 35%;
-  max-width: 500px;
-  margin: 0 auto;
 }
 
 .relative-overlay {
@@ -176,6 +177,10 @@ svg {
   flex: 1;
 }
 
+hr {
+  width: 100%;
+}
+
 .inverse-btn {
   background-color: white;
   border: solid 1px var(--color-blue);
@@ -220,5 +225,11 @@ svg {
 
   input {
     font-size: 16px;
+  }
+
+  .main {
+    max-width: 100%;
+    padding: var(--padding-top-main) 0 0 0;
+    overflow: hidden;
   }
 }

@@ -21,10 +21,8 @@
     position: relative;
 }
 
-
-
 .entry-form form {
-    max-height: 30vh;
+    max-height: 30dvh;
     overflow: hidden auto;
 }
 
@@ -33,7 +31,7 @@
 }
 
 .entry-form .input-box {
-    width: fit-content;
+    width: 100%;
     margin: auto auto 1.6em;
 }
 
@@ -43,6 +41,7 @@
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 4px;
+    box-sizing: border-box;
 }
 
 @keyframes fade-in {
@@ -57,4 +56,12 @@
 
 .fade-in {
     animation: fade-in 0.25s ease-in-out;
+}
+
+/* When phone size or smaller */
+@media (max-width: 767px) {
+    .modal-content {
+        position: absolute;
+        top: 10%;
+    }
 }

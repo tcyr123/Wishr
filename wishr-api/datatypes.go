@@ -3,17 +3,35 @@ package main
 import "time"
 
 type User struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Salt     string `json:"salt"`
-	Password string `json:"password"`
-	Photo    string `json:"photo"`
+	Username    string `json:"username"`
+	Email       string `json:"email"`
+	Salt        string `json:"salt"`
+	Password    string `json:"password"`
+	SecurityQId int    `json:"security_question_id"`
+	SecurityAns string `json:"security_answer"`
+	Photo       string `json:"photo"`
 }
 
 type UserDTO struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Photo    string `json:"photo"`
+	SecQId   int    `json:"security_question_id"`
+}
+
+type SecurityQuestion struct {
+	Id       int    `json:"id"`
+	Question string `json:"question"`
+}
+
+type SecurityAnswer struct {
+	Email  string `json:"email"`
+	Answer string `json:"answer"`
+}
+
+type ResetPasswordDTO struct {
+	SecurityAnswer SecurityAnswer `json:"security_answer"`
+	NewPassword    string         `json:"password"`
 }
 
 type List struct {

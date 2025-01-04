@@ -12,6 +12,8 @@ import (
 var sessions = map[string]Session{} // stores the users sessions. Use redis DB in prod
 var cookie_email string
 
+const COOKIE_TIMEOUT_MINUTES = 15
+
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Method: %s, URL: %s, RemoteAddr: %s", r.Method, r.URL.String(), r.RemoteAddr)
@@ -96,7 +98,7 @@ func WebSocketSessionMiddleware(next func(ws *websocket.Conn, r *http.Request)) 
 func createAndStoreToken(email string) (string, time.Time) {
 	// Create a new random session token
 	sessionToken := uuid.NewString()
-	expiresAt := time.Now().Add(120 * time.Second)
+	expiresAt := time.Now().Add(COOKIE_TIMEOUT_MINUTES * time.Minute)
 
 	// Set the token in the session map, along with the user it represents
 	userSesh := Session{

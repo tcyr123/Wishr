@@ -24,6 +24,7 @@ function TextInputsModal({
                                     type={section.inputType}
                                     checked={section.value || false}
                                     id={section.id}
+                                    disabled={section.disabled || false}
                                     list={section.labelValue}
                                     autoComplete="off"
                                     value={section.value || ''}

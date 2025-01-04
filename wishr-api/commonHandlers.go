@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
+	"strings"
 
 	_ "github.com/lib/pq"
 )
@@ -63,5 +65,12 @@ func isMessageInvalid(message Message) bool {
 }
 
 func isUserInvalid(user User) bool {
-	return user.Email == "" || user.Username == "" || user.Password == ""
+	return user.Email == "" || user.Username == "" || user.Password == "" || !isValidPw(user.Password) || user.SecurityQId <= 0 || user.SecurityAns == ""
+}
+
+func isValidPw(pw string) bool {
+	if len(pw) >= 8 && strings.ContainsAny(pw, "!@#$%^&*") && regexp.MustCompile(`[0-9]`).MatchString(pw) {
+		return true
+	}
+	return false
 }

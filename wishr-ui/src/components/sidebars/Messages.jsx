@@ -24,6 +24,13 @@ function Messages({ listId }) {
         apiToWs = API.replace('http', 'ws')
         ws.current = new WebSocket(`${apiToWs}/ws/messages?list_id=${listId}`);
 
+        // keeps connection alive
+        const pingInterval = setInterval(() => {
+            if (ws.current?.readyState === WebSocket.OPEN) {
+                ws.current.send(JSON.stringify({ message_type: "PING" }));
+            }
+        }, 25000);
+
         ws.current.onmessage = async (event) => {
             const wsMessage = await websocketDataToJSON(event)
             if (wsMessage?.message_type !== "SEND_MESSAGE") {
@@ -44,6 +51,7 @@ function Messages({ listId }) {
         // Cleanup on unmount
         return () => {
             ws.current?.close();
+            clearInterval(pingInterval);
         };
     }, [listId]);
 

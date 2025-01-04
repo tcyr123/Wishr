@@ -1,18 +1,46 @@
+-- SECURITY Qs table
+CREATE TABLE SECURITY_QUESTIONS (
+    id SERIAL PRIMARY KEY,
+    question VARCHAR(255) NOT NULL
+);
+
+INSERT INTO SECURITY_QUESTIONS (question)
+VALUES
+    ('What is your mother''s maiden name?'),
+    ('What was the name of your first pet?'),
+    ('What is the name of the city where you were born?'),
+    ('What was the make and model of your first car?'),
+    ('What is your favorite book or movie?');
+
 -- USERS table
 CREATE TABLE USERS (
     email VARCHAR(255) PRIMARY KEY,
     username VARCHAR(255)  NOT NULL,
     salt VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
+    security_question_id INTEGER REFERENCES SECURITY_QUESTIONS(id),
     photo VARCHAR(255)
 );
 
 -- USERS table test data
-INSERT INTO USERS (username, email, salt, password, photo)
+INSERT INTO USERS (username, email, salt, password, photo, security_question_id)
 VALUES
-    ('TCyr', 'taylor@gmail.com', 'FMrg^S&l9%GR', '4ed7f2e6cf35c3a6dd4248e9245f4a77d09ff01970d1acca0b40975d6b96fb7b', 'simon.jpg'),
-    ('EAnderson', 'easton@gmail.com', 'sDX+XTZOSdx9', 'aa1e6cbbe9cc682bade32c4813c883bf1b5a659b5b1e736aa3d0848b60ec726e', 'alvin.jpg'),
-    ('TKBonk', 'troy@gmail.com', 'Qc=^bFF+YszD', '5f2b395eb708ce07702322e4aca9126df98c64344affb583049a058af00ea34a', 'theodore.jpg');
+    ('TCyr', 'taylor@gmail.com', 'FMrg^S&l9%GR', '4ed7f2e6cf35c3a6dd4248e9245f4a77d09ff01970d1acca0b40975d6b96fb7b', 'simon.jpg', 3),
+    ('EAnderson', 'easton@gmail.com', 'sDX+XTZOSdx9', 'aa1e6cbbe9cc682bade32c4813c883bf1b5a659b5b1e736aa3d0848b60ec726e', 'alvin.jpg', 3),
+    ('TKBonk', 'troy@gmail.com', 'Qc=^bFF+YszD', '5f2b395eb708ce07702322e4aca9126df98c64344affb583049a058af00ea34a', 'theodore.jpg', 3);
+
+-- SECURITY As table
+CREATE TABLE SECURITY_ANSWERS (
+    user_email VARCHAR(255) NOT NULL REFERENCES USERS(email),
+    answer VARCHAR(255) NOT NULL,
+    PRIMARY KEY (user_email)
+);
+
+INSERT INTO SECURITY_ANSWERS (user_email, answer)
+VALUES
+    ('taylor@gmail.com', 'test city'),
+    ('easton@gmail.com', 'test city'),
+    ('troy@gmail.com', 'test city');
 
 -- LISTS table
 CREATE TABLE LISTS (

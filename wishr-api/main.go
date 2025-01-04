@@ -36,6 +36,19 @@ func main() {
 	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		Register(w, r, db)
 	})
+	http.HandleFunc("/security-questions", func(w http.ResponseWriter, r *http.Request) {
+		SecurityQuestions(w, r, db)
+	})
+	http.HandleFunc("/reset-password", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			GetResetPWPrompt(w, r, db)
+		case http.MethodPost:
+			ResetPassword(w, r, db)
+		default:
+			http.Error(w, "Unsupported HTTP method", http.StatusMethodNotAllowed)
+		}
+	})
 	http.HandleFunc("/refresh", Refresh)
 	http.HandleFunc("/logout", Logout)
 

@@ -23,7 +23,7 @@
   --background-end: 80%;
 
   --color-white: whitesmoke;
-  --color-yellow: #AF9B46;
+  --color-yellow: #d3bc43;
   --color-red: #AF125A;
   --color-blue: #1098F7;
   --color-green: #6B8F71;
@@ -32,9 +32,12 @@
   --color-half-opacity: rgb(0 0 0 / 20%);
 
   --padding-top-main: 2rem;
-  --height-nav: max(5vh, 65px);
+  --height-nav: max(5dvh, 65px);
 
-  --vh-minus-nav: calc(100vh - var(--height-nav));
+  --padding-mobile-logo: 45px;
+  --height-mobile-logo: 50px;
+
+  --vh-minus-nav: calc(100dvh - var(--height-nav));
   --vh-minus-nav-pad: calc(var(--vh-minus-nav) - var(--padding-top-main));
 }
 
@@ -58,9 +61,11 @@ h1 {
 
 h2 {
   text-shadow: 1px 1px var(--color-white);
-  ;
 }
 
+.flex {
+  display: flex;
+}
 
 button,
 .button {
@@ -100,12 +105,30 @@ button:focus-visible {
 
   background: -moz-linear-gradient(270deg, hsl(304.53deg 100% 96.4%) 0%, hsl(304.1deg 100% 89.66%) 100%), url(/src/assets/texture-china.webp), linear-gradient(to left, #e7a7cb var(--background-start), #ffe4f3 var(--background-start), #ffe4f3 var(--background-end), #e7a7cb var(--background-end));
 
-
   background: -webkit-linear-gradient(270deg, hsl(304.53deg 100% 96.4%) 0%, hsl(304.1deg 100% 89.66%) 100%), url(/src/assets/texture-china.webp), linear-gradient(to left, #e7a7cb var(--background-start), #ffe4f3 var(--background-start), #ffe4f3 var(--background-end), #e7a7cb var(--background-end));
 
-  filter: progid: DXImageTransform.Microsoft.gradient(startColorstr="#F9CDC3", endColorstr="#FACEFB", GradientType=1);
+  background: -webkit-linear-gradient(270deg, hsl(304.53deg 100% 96.4%) 0%, hsl(304.1deg 100% 89.66%) 100%),
+    -webkit-linear-gradient(0deg, #e7a7cb var(--background-start), #ffe4f3 var(--background-start), #ffe4f3 var(--background-end), #e7a7cb var(--background-end)), url(/src/assets/texture-china-inverted.webp);
+
+  background-image:
+    -webkit-linear-gradient(270deg, hsl(304.53deg 100% 96.4%) 0%, hsl(304.1deg 100% 89.66%) 100%),
+    -webkit-linear-gradient(0deg, #e7a7cb var(--background-start), #ffe4f3 var(--background-start), #ffe4f3 var(--background-end), #e7a7cb var(--background-end)), url(/src/assets/texture-china.webp);
 
   background-blend-mode: difference;
+}
+
+.mobile-logo {
+  margin: 0 auto var(--padding-mobile-logo) auto;
+  width: 30%;
+  height: var(--height-mobile-logo);
+}
+
+.ellipse-overflow {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 /* Scrollbar Section */
@@ -149,6 +172,7 @@ button:focus-visible {
     --background-end: 100%;
     --padding-top-main: 0px;
     --height-nav: 40px;
+    --vh-minus-nav-pad: calc(calc(var(--vh-minus-nav) - var(--padding-top-main)) - var(--height-mobile-logo) - var(--padding-mobile-logo));
   }
 
   .lists {

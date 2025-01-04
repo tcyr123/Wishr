@@ -13,6 +13,7 @@ import { useAlert } from "../../contexts/Alert";
 import ScreenSizeContext from "../../contexts/ScreenSizeContext";
 import { useUser } from "../../contexts/UseUser";
 import useScreenSize from "../../hooks/useScreenSize";
+import LogoHeader from "../header/LogoHeader";
 import TextInputsModal from "../modals/TextInputsModal";
 import Messages from "../sidebars/Messages";
 import Viewers from "../sidebars/Viewers";
@@ -148,6 +149,10 @@ function Items() {
             })
             .catch(error => {
                 console.log(error);
+                if (error.response?.data?.includes("refresh")) {
+                    setAlertInfo({ message: "User already assigned to this item.  Refreshing...", type: "error" });
+                    setTimeout(() => navigate(0), 3000);
+                }
             })
     }
 
@@ -257,10 +262,10 @@ function Items() {
     function buildSwipeItemContent(listedItem) {
         return (<>
             <div className="item-left">
-                <small>{listedItem.item_description}</small>
+                <p>{listedItem.item_name}</p>
             </div>
             <div className="item-center">
-                <p>{listedItem.item_name}</p>
+                <small>{listedItem.item_description}</small>
             </div>
             <div className="item-right">
                 <a target="_blank" href={listedItem.link} rel="noreferrer">{listedItem.link ? <BiLink color='var(--color-blue)' /> : null}</a>
@@ -329,7 +334,6 @@ function Items() {
                     title: 'Cancel',
                     className: 'inverse-btn',
                     callbackFunction: cancelCallback,
-                    onKeyDown: (e) => onEnterPressed(e, callback),
                 },
                 {
                     title: 'Save',
@@ -392,7 +396,6 @@ function Items() {
                     title: 'Cancel',
                     className: 'inverse-btn',
                     callbackFunction: cancelCallback,
-                    onKeyDown: (e) => onEnterPressed(e, callback),
                 },
                 {
                     title: 'Save',
@@ -412,9 +415,10 @@ function Items() {
     return (
         <ScreenSizeContext.Provider value={screenSize}>
             <div className='main'>
+                {isMobileView() && <LogoHeader />}
                 <div className="items-page">
                     <div className="lists" style={{ alignSelf: "center" }}>
-                        <div className="item-list-title">
+                        <div className="item-list-title ellipse-overflow">
                             <h1><a onClick={() => { navigate(-1) }} className="back-arrow"><BiChevronLeft /></a>{location.state.listInfo?.title}</h1>
                         </div>
                         <div className="items-container card">
